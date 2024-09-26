@@ -1,10 +1,13 @@
+use dirs;
+use lazy_static::lazy_static;
+use std::path::{self, PathBuf};
 pub const WIN_HOSTS_PATH: &str = r#"C:\Windows\System32\drivers\etc\hosts"#;
+pub const START_POSITION: &str = r#"# -- MINI_HOSTS_START"#;
 
-pub fn get_home_dir() -> String {
-    use dirs::home_dir;
-    let mut default_home_dir = String::from("./.mini-hosts");
-    if let Some(home_dir) = home_dir() {
-        default_home_dir = home_dir.to_str().unwrap().to_string();
+lazy_static! {
+    pub static ref CONFIG_PATH: PathBuf = {
+        let mut home = dirs::home_dir().expect("Failure to obtain the user's home directory");
+        home.push(".mini_hosts");
+        home
     };
-    default_home_dir
 }

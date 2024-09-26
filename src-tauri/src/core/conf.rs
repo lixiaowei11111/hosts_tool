@@ -1,3 +1,5 @@
+use super::constants::CONFIG_PATH;
+
 // 读取配置文件
 #[tauri::command]
 pub fn read_conf() {}

@@ -4,9 +4,13 @@
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 mod core;
 
-use core::{conf, group};
+use core::{conf, group, init};
 fn main() {
     tauri::Builder::default()
+        .setup(|_app| {
+            init::on_app_init();
+            Ok(())
+        })
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             group::add_group,

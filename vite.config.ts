@@ -1,12 +1,24 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import path from "path";
+import path from "node:path";
 
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-  plugins: [react()],
+  plugins: [react({
+    babel:{
+       presets: [
+           [
+             "@emotion/babel-preset-css-prop",
+             {
+               "autoLabel": "dev-only",
+               "labelFormat": "[local]"
+             }
+           ]
+         ],
+    }
+  })],
   resolve:{
     alias:{
       "@":path.resolve(__dirname,"./src"),

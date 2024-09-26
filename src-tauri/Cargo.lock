@@ -1720,12 +1720,12 @@ name = "mini-hosts"
 version = "0.1.0"
 dependencies = [
  "dirs",
+ "lazy_static",
  "serde",
  "serde_json",
  "tauri",
  "tauri-build",
  "tauri-plugin-shell",
- "tokio",
 ]
 
 [[package]]
