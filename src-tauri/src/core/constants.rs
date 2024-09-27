@@ -1,6 +1,6 @@
 use dirs;
 use lazy_static::lazy_static;
-use std::path::{self, PathBuf};
+use std::path::PathBuf;
 pub const WIN_HOSTS_PATH: &str = r#"C:\Windows\System32\drivers\etc\hosts"#;
 pub const START_POSITION: &str = r#"# -- MINI_HOSTS_START"#;
 

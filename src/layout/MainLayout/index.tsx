@@ -1,5 +1,5 @@
 import Sidebar from "../Sidebar";
-import Editor from "@/components/editor";
+import Editor from "@/components/CodeEditor";
 
 const MainLayout = () => {
 	return (

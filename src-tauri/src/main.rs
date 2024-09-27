@@ -7,8 +7,10 @@ mod core;
 use core::{conf, group, init};
 fn main() {
     tauri::Builder::default()
-        .setup(|_app| {
-            init::on_app_init();
+        .setup(|app| {
+            tauri::async_runtime::block_on(async move {
+                init::on_app_init(app).await;
+            });
             Ok(())
         })
         .plugin(tauri_plugin_shell::init())

@@ -1,15 +1,19 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
 pub enum Status {
     ON,
     OFF,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Group {
-    name: String,
-    id: u32,
-    status: Status,
+    pub name: String,
+    pub id: u32,
+    pub status: Status,
 }
 
-pub struct GroupIdList(Vec<i32>);
+pub struct GroupIdList(pub Vec<u32>);
 
 // 添加group
 #[tauri::command]
