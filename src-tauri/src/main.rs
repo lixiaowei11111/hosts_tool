@@ -20,9 +20,9 @@ fn main() {
             group::update_group,
             group::read_group,
             conf::read_conf,
-            conf::save_conf,
             conf::update_conf,
-            conf::get_conf_path
+            conf::update_single_group,
+            conf::del_single_group,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
