@@ -22,4 +22,5 @@ lazy_static! {
     };
     pub static ref ID_CONFIG_PATH: PathBuf = CONFIG_PATH.join("data").join("id_list");
     pub static ref LIST_PATH: PathBuf = CONFIG_PATH.join("data").join("list");
+    pub static ref LOG_PATH: PathBuf = CONFIG_PATH.join("log");
 }

@@ -9,11 +9,14 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "title": "mini-hosts",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "transparent": true,
+        "resizable": true
       }
     ],
     "security": {

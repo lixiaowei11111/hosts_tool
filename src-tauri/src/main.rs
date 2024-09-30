@@ -3,16 +3,22 @@
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 mod core;
+mod setup;
 
-use core::{conf, group, init};
+use core::{conf, constants::LOG_PATH, group, init};
 fn main() {
     tauri::Builder::default()
-        .setup(|app| {
-            tauri::async_runtime::block_on(async move {
-                init::on_app_init(app).await;
-            });
-            Ok(())
-        })
+        .plugin(
+            tauri_plugin_log::Builder::new()
+                .target(tauri_plugin_log::Target::new(
+                    tauri_plugin_log::TargetKind::Folder {
+                        path: LOG_PATH.clone(),
+                        file_name: None,
+                    },
+                ))
+                .build(),
+        )
+        .setup(setup::init)
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             group::add_group,
@@ -23,6 +29,8 @@ fn main() {
             conf::update_conf,
             conf::update_single_group,
             conf::del_single_group,
+            init::read_system_hosts,
+            init::update_system_hosts,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
