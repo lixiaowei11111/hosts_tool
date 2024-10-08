@@ -12,8 +12,9 @@
     "macOSPrivateApi": true,
     "windows": [
       {
+        "decorations": false,
         "title": "mini-hosts",
-        "width": 800,
+        "width": 1000,
         "height": 600,
         "transparent": true,
         "resizable": true

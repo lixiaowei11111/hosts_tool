@@ -1,7 +1,7 @@
 import { ThemeProvider } from "@emotion/react";
 import theme from "./constants/theme";
 import MainLayout from "./layout/MainLayout";
-import "./App.css";
+import "./styles/index.less";
 
 function App() {
 	return (

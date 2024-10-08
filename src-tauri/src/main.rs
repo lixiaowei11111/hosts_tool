@@ -20,6 +20,7 @@ fn main() {
         )
         .setup(setup::init)
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             group::add_group,
             group::del_group,

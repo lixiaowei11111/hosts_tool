@@ -2,23 +2,24 @@
 name = "mini-hosts"
 version = "0.1.0"
 description = "A Tauri App"
-authors = ["you"]
+authors = ["lxw"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-rc", features = [] }
+tauri-build = { version = "2.0.1", features = [] }
 
 [dependencies]
-tauri = { version = "2.0.0-rc", features = ["macos-private-api"] }
-tauri-plugin-shell = "2.0.0-rc"
+tauri = { version = "2.0.2", features = ["macos-private-api"] }
+tauri-plugin-shell = "2.0.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 dirs = "5.0.1"
 lazy_static = "1.5.0"
 chrono = { version = "0.4.38", features = ["serde"] }
 thiserror = "1.0.64"
-tauri-plugin-log = "2.0.0-rc"
+tauri-plugin-log = "2.0.1"
 log = "0.4.22"
 window-vibrancy = "0.5.2"
+tauri-plugin-dialog = "2.0.0-rc"

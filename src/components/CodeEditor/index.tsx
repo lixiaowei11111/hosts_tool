@@ -5,6 +5,8 @@ import { EditorState } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import { defaultKeymap } from "@codemirror/commands";
 
+
+
 const Editor: FC = () => {
 	const editorRef = useRef(null);
 
@@ -16,6 +18,7 @@ const Editor: FC = () => {
 			".cm-gutters": {
 				"background-color": "transparent",
 				"border-right": "none",
+				color: "#fff",
 			},
 		});
 		const startState = EditorState.create({
