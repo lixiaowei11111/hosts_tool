@@ -28,7 +28,7 @@ fn main() {
             group::read_group,
             conf::read_conf,
             conf::update_conf,
-            conf::update_single_group,
+            conf::update_group_status,
             conf::del_single_group,
             init::read_system_hosts,
             init::update_system_hosts,

@@ -51,7 +51,6 @@ impl Into<InvokeError> for WriteConfError {
     }
 }
 
-// 读取配置文件
 #[tauri::command]
 pub fn read_conf() -> Result<Vec<Group>, ReadConfError> {
     let mut file = File::open(&*ID_CONFIG_PATH)?;
@@ -61,7 +60,6 @@ pub fn read_conf() -> Result<Vec<Group>, ReadConfError> {
     Ok(groups)
 }
 
-// 更新配置文件
 #[tauri::command]
 pub fn update_conf(groups: Vec<Group>) -> Result<(), WriteConfError> {
     let contents = serde_json::to_string(&groups)?;
@@ -70,9 +68,8 @@ pub fn update_conf(groups: Vec<Group>) -> Result<(), WriteConfError> {
     Ok(())
 }
 
-// 根据id更新id_list中单个group的状态
 #[tauri::command]
-pub fn update_single_group(id: u32, status: Status) {
+pub fn update_group_status(id: u32, status: Status) {
     if let Ok(mut groups) = read_conf() {
         use chrono::Utc;
         for group in &mut groups {
@@ -86,7 +83,6 @@ pub fn update_single_group(id: u32, status: Status) {
     }
 }
 
-// 根据id删除某个group到回收站/从回收站彻底删除
 #[tauri::command]
 pub fn del_single_group(id: u32) {
     if let Ok(groups) = read_conf() {
@@ -95,11 +91,11 @@ pub fn del_single_group(id: u32) {
             .into_iter()
             .filter_map(|mut g| {
                 if g.id == id {
-                    // 彻底删除
+                    // completely erase
                     if g.status == Status::DELETE {
                         None
                     } else {
-                        // 删除到回收站
+                        // to bin
                         g.status = Status::DELETE;
                         g.update_time = Utc::now().timestamp();
                         Some(g)

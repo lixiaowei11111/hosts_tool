@@ -12,7 +12,6 @@ struct GroupDetail {
     update_time: i64,
 }
 
-// 添加对应id文件
 #[tauri::command]
 pub fn add_group(id: u32) {
     let group_path: PathBuf = (&*LIST_PATH).join(id.to_string());
@@ -27,14 +26,12 @@ pub fn add_group(id: u32) {
         .expect("Failed to write group file");
 }
 
-// 删除对应id文件
 #[tauri::command]
 pub fn del_group(id: u32) {
     let group_path: PathBuf = (&*LIST_PATH).join(id.to_string());
     fs::remove_file(&group_path).expect("Failed to remove group file");
 }
 
-// 修改对应id的content
 #[tauri::command]
 pub fn update_group(id: u32, content: String) {
     let group_path: PathBuf = (&*LIST_PATH).join(id.to_string());
@@ -50,7 +47,6 @@ pub fn update_group(id: u32, content: String) {
         .expect("Failed to update group file");
 }
 
-// 查询对应id文件
 #[tauri::command]
 pub fn read_group(id: u32) -> String {
     let group_path: PathBuf = (&*LIST_PATH).join(id.to_string());

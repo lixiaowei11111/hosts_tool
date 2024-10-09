@@ -8,7 +8,6 @@ use super::conf::{read_conf, Group, Status};
 use super::constants::{END_POSITION, HOSTS_PATH, ID_CONFIG_PATH, LIST_PATH, START_POSITION};
 use super::group::read_group;
 
-// 读取系统hosts
 #[tauri::command]
 pub fn read_system_hosts() -> String {
     let hosts = Path::new(HOSTS_PATH);
@@ -19,10 +18,6 @@ pub fn read_system_hosts() -> String {
     contents
 }
 
-// 更新系统hosts
-// 读取id_list
-//根据id_list筛选出Status::ON的group
-//将group对应的content提取出来,拼接
 pub fn joint_content() -> Option<String> {
     if let Ok(groups) = read_conf() {
         let ids_content: Vec<String> = groups
@@ -41,8 +36,6 @@ pub fn joint_content() -> Option<String> {
     }
 }
 
-// 将 START_POSITION 和 END_POSITION 和contents拼接
-// 替换系统hosts中的START_POSITION和END_POSITION的内容,
 #[tauri::command]
 pub fn update_system_hosts() {
     if let Some(contents) = joint_content() {
@@ -70,7 +63,6 @@ pub fn update_system_hosts() {
     }
 }
 
-// 创建文件/文件夹失败
 pub fn create_failed(app: &App, e: Error) {
     app.emit("create_failed", e.to_string())
         .expect("An error occurred in Event.");

@@ -8,11 +8,13 @@ pub const END_POSITION: &str = r#"#  --- MINI_HOSTS_END ---"#;
 #[cfg(target_os = "windows")]
 pub const HOSTS_PATH: &str = r#"C:\Windows\System32\drivers\etc\hosts"#;
 
-#[cfg(target_os = "linux")]
+// TODO
+#[cfg(any(target_os = "macos", target_os = "linux"))]
 pub const HOSTS_PATH: &str = "/etc/hosts";
 
-#[cfg(target_os = "macos")]
-pub const HOSTS_PATH: &str = "/private/etc/hosts";
+// TODO
+#[cfg(target_os = "android")]
+pub const HOSTS_PATH: &str = "/system/etc/hosts";
 
 lazy_static! {
     pub static ref CONFIG_PATH: PathBuf = {

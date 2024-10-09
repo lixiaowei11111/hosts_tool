@@ -3,27 +3,50 @@ import { useRef, useEffect } from "react";
 // editor
 import { EditorState } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
-import { defaultKeymap } from "@codemirror/commands";
+import { defaultKeymap, insertNewline } from "@codemirror/commands";
+import { syntaxHighlighting } from "@codemirror/language";
+import { customLanguage, customHighlightStyle } from "./highlight";
 
+interface EditorProps {
+	doc: string;
+	onChange?: (doc: string) => void;
+}
 
+// https://codemirror.net/docs/ref/#commands.insertNewlineAndIndent
+const customKeymap = keymap.of([
+	{ key: "Enter", run: insertNewline },
+	...defaultKeymap,
+]);
 
-const Editor: FC = () => {
+const Editor: FC<EditorProps> = ({ doc, onChange }) => {
 	const editorRef = useRef(null);
 
 	useEffect(() => {
 		const customTheme = EditorView.theme({
+			"&": {
+				color: "#fff",
+			},
+			".cm-content": {
+				"caret-color": "#fff",
+			},
 			"&.cm-focused": {
 				outline: "none",
 			},
 			".cm-gutters": {
 				"background-color": "transparent",
 				"border-right": "none",
-				color: "#fff",
+				color: "#ddd",
 			},
 		});
 		const startState = EditorState.create({
-			doc: "",
-			extensions: [keymap.of(defaultKeymap), lineNumbers(), customTheme],
+			doc: doc,
+			extensions: [
+				customKeymap,
+				lineNumbers(),
+				customTheme,
+				customLanguage,
+				syntaxHighlighting(customHighlightStyle),
+			],
 		});
 
 		const view = new EditorView({
@@ -33,7 +56,7 @@ const Editor: FC = () => {
 		return () => {
 			view.destroy();
 		};
-	}, []);
+	}, [doc]);
 
 	return <div ref={editorRef} />;
 };
