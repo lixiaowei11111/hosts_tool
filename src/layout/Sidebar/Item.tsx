@@ -1,12 +1,13 @@
 import { Switch } from "@/components/ui/switch";
-import { invoke } from "@tauri-apps/api/core";
-import { message } from "@tauri-apps/plugin-dialog";
 import type { FC } from "react";
-import { type Group, STATUS, COMMAND } from "@/lib/ipc";
+import { type Group, STATUS } from "@/lib/ipc";
+import { cn } from "@/lib/utils";
 
 interface ItemProps {
+	active: boolean;
 	group: Group;
-	onChange?: (id: number, status: STATUS) => void;
+	onSwitch: (id: number, status: STATUS) => void;
+	onClick: (id: number) => void;
 }
 
 const statusToChecked = (status: STATUS): boolean => status === STATUS.ON;
@@ -14,19 +15,23 @@ const statusToChecked = (status: STATUS): boolean => status === STATUS.ON;
 const checkedToStatus = (checked: boolean): STATUS =>
 	checked ? STATUS.ON : STATUS.OFF;
 
-const Item: FC<ItemProps> = ({ group, onChange }) => {
+const Item: FC<ItemProps> = ({ group, onSwitch, active, onClick }) => {
 	const handleCheckedChange = async (checked: boolean) => {
-		const status = checkedToStatus(checked);
-		try {
-			await invoke(COMMAND.UPDATE_GROUP_STATUS, { id: group.id, status });
-			onChange?.(group.id, status);
-		} catch (error) {
-			console.log("[DEBUG]", error);
-			message("switch group status failed", "error");
-		}
+		onSwitch(group.id, checkedToStatus(checked));
 	};
+
+	const handleClick = () => {
+		onClick(group.id);
+	};
+
 	return (
-		<div className="py-1 px-2 text-white flex items-center justify-between">
+		<div
+			onClick={handleClick}
+			className={cn(
+				"py-2 px-4 text-white flex items-center justify-between",
+				active ? "bg-[hsl(212,100%,48%,0.3)]" : "",
+			)}
+		>
 			<span>{group.name}</span>
 			<Switch
 				id={group.id.toString()}

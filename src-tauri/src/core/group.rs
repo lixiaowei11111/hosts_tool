@@ -1,4 +1,7 @@
+use crate::err_to_string;
+
 use super::constants::LIST_PATH;
+use super::error::AnyHowResult;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::fs::{self, File};
@@ -13,47 +16,46 @@ struct GroupDetail {
 }
 
 #[tauri::command]
-pub fn add_group(id: u32) {
+pub fn add_group(id: u32) -> AnyHowResult {
     let group_path: PathBuf = (&*LIST_PATH).join(id.to_string());
-    let mut file = File::create(&group_path).expect("Failed to create group file");
+    let mut file = err_to_string!(File::create(&group_path))?;
     let group_detail: GroupDetail = GroupDetail {
         id,
         content: String::from(""),
         update_time: Utc::now().timestamp(),
     };
-    let contents = serde_json::to_string(&group_detail).unwrap();
-    file.write_all(contents.as_bytes())
-        .expect("Failed to write group file");
+    let contents = err_to_string!(serde_json::to_string(&group_detail))?;
+    err_to_string!(file.write_all(contents.as_bytes()))?;
+    Ok(())
 }
 
 #[tauri::command]
-pub fn del_group(id: u32) {
+pub fn del_group(id: u32) -> AnyHowResult {
     let group_path: PathBuf = (&*LIST_PATH).join(id.to_string());
-    fs::remove_file(&group_path).expect("Failed to remove group file");
+    err_to_string!(fs::remove_file(&group_path))?;
+    Ok(())
 }
 
 #[tauri::command]
-pub fn update_group(id: u32, content: String) {
+pub fn update_group(id: u32, content: String) -> AnyHowResult {
     let group_path: PathBuf = (&*LIST_PATH).join(id.to_string());
-    let mut file = File::open(&group_path).expect("Failed to open group file");
+    let mut file = err_to_string!(File::open(&group_path))?;
     let mut contents = String::new();
-    file.read_to_string(&mut contents)
-        .expect("Failed to read group file");
-    let mut group_detail: GroupDetail = serde_json::from_str(&contents).unwrap();
+    err_to_string!(file.read_to_string(&mut contents))?;
+    let mut group_detail: GroupDetail = err_to_string!(serde_json::from_str(&contents))?;
     group_detail.content = content;
     group_detail.update_time = Utc::now().timestamp();
-    let updated_contents = serde_json::to_string(&group_detail).unwrap();
-    file.write_all(updated_contents.as_bytes())
-        .expect("Failed to update group file");
+    let updated_contents = err_to_string!(serde_json::to_string(&group_detail))?;
+    err_to_string!(file.write_all(updated_contents.as_bytes()))?;
+    Ok(())
 }
 
 #[tauri::command]
-pub fn read_group(id: u32) -> String {
+pub fn read_group(id: u32) -> AnyHowResult<String> {
     let group_path: PathBuf = (&*LIST_PATH).join(id.to_string());
-    let mut file = File::open(&group_path).expect("Failed to open group file");
+    let mut file = err_to_string!(File::open(&group_path))?;
     let mut contents = String::new();
-    file.read_to_string(&mut contents)
-        .expect("Failed to read group file");
-    let group_detail: GroupDetail = serde_json::from_str(&contents).unwrap();
-    group_detail.content
+    err_to_string!(file.read_to_string(&mut contents))?;
+    let group_detail: GroupDetail = err_to_string!(serde_json::from_str(&contents))?;
+    Ok(group_detail.content)
 }

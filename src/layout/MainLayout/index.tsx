@@ -1,17 +1,14 @@
 import Sidebar from "../Sidebar";
 import Editor from "@/components/CodeEditor";
 import BaseTitleBar from "@/components/BaseTitleBar";
-import type { STATUS } from "@/lib/ipc";
+import { useState } from "react";
 
 const MainLayout = () => {
-	// group id change
-	const handleSidebarChange = (id: number, status: STATUS) => {
-		console.log(id, status, "[DEBUG] mainlayout");
-	};
+	const [id, setId] = useState<number>(0);
 
-	// group content change
-	const handleEditorChange = (doc: string) => {
-		console.log(doc, "[DEBUG] mainlayout");
+	// group id change
+	const handleSidebarChange = (id: number) => {
+		setId(id);
 	};
 
 	return (
@@ -22,7 +19,7 @@ const MainLayout = () => {
 			<Sidebar onChange={handleSidebarChange} />
 			<main className="w-full border-l-[1px] border-solid border-gray-400">
 				<div className="h-[calc(100%-54px)] overflow-auto mt-[30px]">
-					<Editor doc="" onChange={handleEditorChange} />
+					<Editor id={id} />
 				</div>
 				<footer className="w-full h-6 text-gray-500 indent-[30px]">
 					display some information

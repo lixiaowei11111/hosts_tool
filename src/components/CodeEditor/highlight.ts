@@ -2,7 +2,6 @@ import { StreamLanguage } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
 import type { StreamParser, StringStream } from "@codemirror/language";
 import { HighlightStyle } from "@codemirror/language";
-
 interface CustomParserState {
 	lineStart: boolean;
 	hasSpace: boolean;
@@ -56,8 +55,8 @@ export const customLanguage =
 	StreamLanguage.define<CustomParserState>(customParser);
 
 export const customHighlightStyle = HighlightStyle.define([
-	{ tag: t.comment, color: "green" },
-	{ tag: t.variableName, color: "blue" },
+	{ tag: t.comment, color: "hsl(133,50%,32%)" },
+	{ tag: t.variableName, color: "hsl(212,100%,48%)" },
 	{ tag: t.content, color: "white" },
-	{ tag: t.invalid, color: "red" },
+	{ tag: t.invalid, color: "hsl(355,64%,68.4%)" },
 ]);

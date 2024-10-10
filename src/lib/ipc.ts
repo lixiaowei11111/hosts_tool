@@ -11,6 +11,13 @@ export interface Group {
 	update_time: number;
 }
 
+export interface GroupDetail{
+  id: number;
+  content: string,
+  update_time: number,
+
+}
+
 export enum COMMAND {
   READ_CONF="read_conf",
   UPDATE_CONF="update_conf",
