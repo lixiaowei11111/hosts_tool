@@ -1,6 +1,6 @@
-use crate::err_to_string;
 use super::constants::ID_CONFIG_PATH;
 use super::error::AnyHowResult;
+use crate::err_to_string;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{Read, Write};
@@ -34,7 +34,7 @@ pub fn read_conf() -> AnyHowResult<GroupList> {
 #[tauri::command]
 pub fn update_conf(groups: Vec<Group>) -> AnyHowResult {
     let contents = err_to_string!(serde_json::to_string(&groups))?;
-    let mut file = err_to_string!(File::open(&*ID_CONFIG_PATH))?;
+    let mut file = err_to_string!(File::create(&*ID_CONFIG_PATH))?;
     err_to_string!(file.write_all(contents.as_bytes()))?;
     Ok(())
 }

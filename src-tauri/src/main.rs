@@ -24,7 +24,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             group::add_group,
             group::del_group,
-            group::update_group,
+            group::update_group_content,
             group::read_group,
             conf::read_conf,
             conf::update_conf,

@@ -3,17 +3,20 @@ import { invoke } from "@tauri-apps/api/core";
 import { useState, useEffect, type FC } from "react";
 import { message } from "@tauri-apps/plugin-dialog";
 import Item from "./Item";
+import { useToast } from "@/hooks/use-toast";
 
 interface SidebarProps {
 	onChange: (id: number) => void;
 }
 
 const Sidebar: FC<SidebarProps> = ({ onChange }) => {
+	const { toast } = useToast();
+
 	const [groups, setGroups] = useState<Group[]>([]);
 	const [curId, setCurId] = useState<number>();
 
 	useEffect(() => {
-		getList();
+		getList(true);
 	}, []);
 
 	const handleSelect = (id: number) => {
@@ -24,17 +27,22 @@ const Sidebar: FC<SidebarProps> = ({ onChange }) => {
 	const handleSwitch = async (id: number, status: STATUS) => {
 		try {
 			await invoke(COMMAND.UPDATE_GROUP_STATUS, { id, status });
+			await getList();
+			toast({
+				description: "switch group status success",
+				variant: "success",
+			});
 		} catch (error) {
 			console.log("[DEBUG]", error);
 			message(`switch group status failed ${error}`, "error");
 		}
 	};
 
-	const getList = async () => {
+	const getList = async (setInitId = false) => {
 		try {
 			const groups: Group[] = await invoke(COMMAND.READ_CONF);
 			setGroups(groups);
-			setCurId(groups[0].id);
+			setInitId && setCurId(groups[0].id);
 		} catch (error) {
 			console.log("[DEBUG] read conf file failed", error);
 			message(`read conf file failed ${error}`, "error");

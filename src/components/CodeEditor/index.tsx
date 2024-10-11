@@ -1,10 +1,10 @@
 import type { FC } from "react";
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useMemo } from "react";
 // ipc
 import { invoke } from "@tauri-apps/api/core";
 import { COMMAND, type GroupDetail } from "@/lib/ipc";
 // editor
-import { EditorState } from "@codemirror/state";
+import { EditorState, StateEffect } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
 import { syntaxHighlighting } from "@codemirror/language";
 import { customLanguage, customHighlightStyle } from "./highlight";
@@ -14,6 +14,9 @@ import {
 	historyKeymap,
 	history,
 } from "@codemirror/commands";
+
+import { useToast } from "@/hooks/use-toast";
+import { useDebounceFn } from "ahooks";
 
 interface EditorProps {
 	id: number;
@@ -31,17 +34,54 @@ const Editor: FC<EditorProps> = ({ id }) => {
 	const editorRef = useRef<HTMLDivElement>(null);
 	const viewRef = useRef<EditorView | null>(null);
 
+	const { toast } = useToast();
+
 	const getGroupDetailById = useCallback(async (id: number) => {
 		try {
 			const groupDetail: GroupDetail = await invoke(COMMAND.READ_GROUP, { id });
 			console.log("[DEBUG] read group detail success", groupDetail);
 			const transaction = viewRef.current?.state.update({
 				changes: { from: 0, insert: groupDetail.content },
+				effects: StateEffect.appendConfig.of(EditorView.editable.of(id !== -1)),
 			});
 			transaction && viewRef.current?.dispatch(transaction);
 		} catch (error) {
 			console.log("[DEBUG] read group detail failed", error);
 		}
+	}, []);
+
+	const handleUpdateGroup = async () => {
+		try {
+			const content = viewRef.current?.state.toJSON().doc;
+			await invoke(COMMAND.UPDATE_GROUP_CONTENT, { id, content });
+			toast({
+				description: "save success",
+				variant: "success",
+			});
+		} catch (error) {
+			console.log("[debug] error", error);
+			toast({
+				description: "save failed",
+				variant: "destructive",
+			});
+		}
+	};
+
+	const { run: debounceUpdateGroup } = useDebounceFn(handleUpdateGroup, {
+		wait: 300,
+	});
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	const saveKeymap = useMemo(() => {
+		return keymap.of([
+			{
+				key: "Mod-s",
+				run: () => {
+					debounceUpdateGroup();
+					return true;
+				},
+			},
+		]);
 	}, []);
 
 	useEffect(() => {
@@ -66,6 +106,7 @@ const Editor: FC<EditorProps> = ({ id }) => {
 			doc: "",
 			extensions: [
 				customKeymap,
+				saveKeymap,
 				lineNumbers(),
 				history(),
 				customTheme,
@@ -84,7 +125,7 @@ const Editor: FC<EditorProps> = ({ id }) => {
 		return () => {
 			view.destroy();
 		};
-	}, []);
+	}, [saveKeymap]);
 
 	useEffect(() => {
 		getGroupDetailById(id);

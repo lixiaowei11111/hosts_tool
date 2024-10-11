@@ -25,7 +25,7 @@ export enum COMMAND {
   DEL_SINGLE_GROUP="del_single_group",
   ADD_GROUP="add_group",
   DEL_GROUP="del_group",
-  UPDATE_GROUP="update_group",
+  UPDATE_GROUP_CONTENT="update_group_content",
   READ_GROUP="read_group",
   READ_SYSTEM_HOSTS="read_system_hosts",
   UPDATE_SYSTEM_HOSTS="update_system_hosts", 

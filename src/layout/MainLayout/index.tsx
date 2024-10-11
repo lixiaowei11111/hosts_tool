@@ -2,6 +2,7 @@ import Sidebar from "../Sidebar";
 import Editor from "@/components/CodeEditor";
 import BaseTitleBar from "@/components/BaseTitleBar";
 import { useState } from "react";
+import { Toaster } from "@/components/ui/toaster";
 
 const MainLayout = () => {
 	const [id, setId] = useState<number>(0);
@@ -25,6 +26,7 @@ const MainLayout = () => {
 					display some information
 				</footer>
 			</main>
+			<Toaster />
 		</div>
 	);
 };
