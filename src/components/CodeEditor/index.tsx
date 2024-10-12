@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useDebounceFn } from "ahooks";
 
 interface EditorProps {
-	id: number;
+	uuid: string;
 	onChange?: (doc: string) => void;
 }
 
@@ -30,21 +30,30 @@ const customKeymap = keymap.of([
 	...historyKeymap,
 ]);
 
-const Editor: FC<EditorProps> = ({ id }) => {
+const Editor: FC<EditorProps> = ({ uuid }) => {
 	const editorRef = useRef<HTMLDivElement>(null);
 	const viewRef = useRef<EditorView | null>(null);
 
 	const { toast } = useToast();
 
-	const getGroupDetailById = useCallback(async (id: number) => {
+	const getGroupDetailById = useCallback(async (uuid: string) => {
 		try {
-			const groupDetail: GroupDetail = await invoke(COMMAND.READ_GROUP, { id });
+			const groupDetail: GroupDetail = await invoke(COMMAND.READ_GROUP, {
+				uuid,
+			});
 			console.log("[DEBUG] read group detail success", groupDetail);
 			const transaction = viewRef.current?.state.update({
-				changes: { from: 0, insert: groupDetail.content },
-				effects: StateEffect.appendConfig.of(EditorView.editable.of(id !== -1)),
+				changes: {
+					from: 0,
+					insert: groupDetail.content,
+				},
+				effects: StateEffect.appendConfig.of(EditorView.editable.of(!uuid)),
 			});
 			transaction && viewRef.current?.dispatch(transaction);
+			console.log(
+				"[debug] dispatch after",
+				viewRef.current?.state.toJSON().doc,
+			);
 		} catch (error) {
 			console.log("[DEBUG] read group detail failed", error);
 		}
@@ -53,7 +62,7 @@ const Editor: FC<EditorProps> = ({ id }) => {
 	const handleUpdateGroup = async () => {
 		try {
 			const content = viewRef.current?.state.toJSON().doc;
-			await invoke(COMMAND.UPDATE_GROUP_CONTENT, { id, content });
+			await invoke(COMMAND.UPDATE_GROUP_CONTENT, { uuid, content });
 			toast({
 				description: "save success",
 				variant: "success",
@@ -127,9 +136,10 @@ const Editor: FC<EditorProps> = ({ id }) => {
 		};
 	}, [saveKeymap]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		getGroupDetailById(id);
-	}, [id, getGroupDetailById]);
+		getGroupDetailById(uuid);
+	}, [uuid]);
 
 	return <div ref={editorRef} />;
 };

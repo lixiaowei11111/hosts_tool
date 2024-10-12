@@ -5,6 +5,8 @@ import type {
   ToastProps,
 } from "@/components/ui/toast"
 
+import { forwardConsole } from "@/lib/logger"
+
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
 
@@ -149,6 +151,8 @@ function toast({ ...props }: Toast) {
     })
   const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
 
+  
+
   dispatch({
     type: "ADD_TOAST",
     toast: {
@@ -160,6 +164,10 @@ function toast({ ...props }: Toast) {
       },
     },
   })
+
+  if(props.variant==='destructive'){
+    forwardConsole("error")
+  }
 
   return {
     id: id,

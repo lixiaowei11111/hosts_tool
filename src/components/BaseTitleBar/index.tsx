@@ -1,8 +1,8 @@
 import Icon from "@/components/Icon";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { message } from "@tauri-apps/plugin-dialog";
 import { useMemo, useState } from "react";
 import { css } from "@emotion/react";
+import { useToast } from "@/hooks/use-toast";
 import type {
 	FC,
 	MouseEvent,
@@ -22,7 +22,7 @@ const titlebarStyle = css`
   right: 0;
 `;
 
-const titlebarButtonStyle = css`
+export const titlebarButtonStyle = css`
  	display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -43,6 +43,7 @@ const closeButtonSeyle = css([
 
 const BaseTitleBar: FC<PropsWithChildren> = ({ children }) => {
 	const [isMaximized, setIsMaximized] = useState<boolean>(false);
+	const { toast } = useToast();
 
 	const appWindow = useMemo(() => {
 		return getCurrentWindow();
@@ -53,10 +54,9 @@ const BaseTitleBar: FC<PropsWithChildren> = ({ children }) => {
 		try {
 			await appWindow.minimize();
 		} catch (error) {
-			console.log("[DEBUG] 最小化窗口发生错误", error);
-			await message("[DEBUG] 最小化窗口发生错误", {
-				title: "DEBUG",
-				kind: "error",
+			toast({
+				description: `minimize window occurred error${error}`,
+				variant: "destructive",
 			});
 		}
 	};
@@ -67,10 +67,9 @@ const BaseTitleBar: FC<PropsWithChildren> = ({ children }) => {
 			const isMaximized = await appWindow.isMaximized();
 			setIsMaximized(isMaximized);
 		} catch (error) {
-			console.log("[DEBUG] 切换最大化窗口发生错误", error);
-			await message("[DEBUG] 切换最大化窗口发生错误", {
-				title: "DEBUG",
-				kind: "error",
+			toast({
+				description: `toggle maximize window occurred error${error}`,
+				variant: "destructive",
 			});
 		}
 	};
@@ -79,35 +78,47 @@ const BaseTitleBar: FC<PropsWithChildren> = ({ children }) => {
 		try {
 			await appWindow.close();
 		} catch (error) {
-			console.log("[DEBUG] 关闭窗口发生错误", error);
-			await message("[DEBUG] 关闭窗口发生错误", {
-				title: "DEBUG",
-				kind: "error",
+			toast({
+				description: `close window occurred error${error}`,
+				variant: "destructive",
 			});
 		}
 	};
 
-	const handleMouseDown: MouseEventHandler<HTMLDivElement> = (e) => {
-		if (e.buttons === 1 && e.detail !== 2 && e.target === e.currentTarget) {
-			appWindow.startDragging();
+	const handleMouseDown: MouseEventHandler<HTMLDivElement> = async (e) => {
+		try {
+			if (e.buttons === 1 && e.detail !== 2 && e.target === e.currentTarget) {
+				await appWindow.startDragging();
+			}
+		} catch (error) {
+			toast({
+				description: `start dragging window occurred error${error}`,
+				variant: "destructive",
+			});
 		}
 	};
 
 	return (
 		<div css={titlebarStyle} onMouseDown={handleMouseDown}>
-			{children}
-			<Icon
-				css={titlebarButtonStyle}
-				type="window-minimize"
-				onClick={handleMinimize}
-			/>
-			<Icon
-				css={titlebarButtonStyle}
-				className="text-[14px]"
-				type={isMaximized ? "window-restore" : "window-maximize"}
-				onClick={handleToggleMaximize}
-			/>
-			<Icon css={closeButtonSeyle} type="window-close" onClick={handleClose} />
+			<div>{children}</div>
+			<div>
+				<Icon
+					css={titlebarButtonStyle}
+					type="window-minimize"
+					onClick={handleMinimize}
+				/>
+				<Icon
+					css={titlebarButtonStyle}
+					className="text-[14px]"
+					type={isMaximized ? "window-restore" : "window-maximize"}
+					onClick={handleToggleMaximize}
+				/>
+				<Icon
+					css={closeButtonSeyle}
+					type="window-close"
+					onClick={handleClose}
+				/>
+			</div>
 		</div>
 	);
 };

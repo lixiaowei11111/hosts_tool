@@ -2,12 +2,13 @@ import { Switch } from "@/components/ui/switch";
 import type { FC } from "react";
 import { type Group, STATUS } from "@/lib/ipc";
 import { cn } from "@/lib/utils";
+import Icon from "@/components/Icon";
 
 interface ItemProps {
 	active: boolean;
 	group: Group;
-	onSwitch: (id: number, status: STATUS) => void;
-	onClick: (id: number) => void;
+	onSwitch: (uuid: string, status: STATUS) => void;
+	onClick: (uuid: string) => void;
 }
 
 const statusToChecked = (status: STATUS): boolean => status === STATUS.ON;
@@ -17,11 +18,11 @@ const checkedToStatus = (checked: boolean): STATUS =>
 
 const Item: FC<ItemProps> = ({ group, onSwitch, active, onClick }) => {
 	const handleCheckedChange = async (checked: boolean) => {
-		onSwitch(group.id, checkedToStatus(checked));
+		onSwitch(group.uuid, checkedToStatus(checked));
 	};
 
 	const handleClick = () => {
-		onClick(group.id);
+		onClick(group.uuid);
 	};
 
 	return (
@@ -32,9 +33,12 @@ const Item: FC<ItemProps> = ({ group, onSwitch, active, onClick }) => {
 				active ? "bg-[hsl(212,100%,48%,0.3)]" : "",
 			)}
 		>
-			<span>{group.name}</span>
+			<div>
+				<Icon className="text-sm" type="file" />
+				<span className="ml-1">{group.name}</span>
+			</div>
 			<Switch
-				id={group.id.toString()}
+				id={group.uuid.toString()}
 				checked={statusToChecked(group.status)}
 				onCheckedChange={handleCheckedChange}
 			/>

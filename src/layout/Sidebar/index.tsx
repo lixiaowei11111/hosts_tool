@@ -6,27 +6,27 @@ import Item from "./Item";
 import { useToast } from "@/hooks/use-toast";
 
 interface SidebarProps {
-	onChange: (id: number) => void;
+	onChange: (uuid: string) => void;
 }
 
 const Sidebar: FC<SidebarProps> = ({ onChange }) => {
 	const { toast } = useToast();
 
 	const [groups, setGroups] = useState<Group[]>([]);
-	const [curId, setCurId] = useState<number>();
+	const [curId, setCurId] = useState<string>();
 
 	useEffect(() => {
 		getList(true);
 	}, []);
 
-	const handleSelect = (id: number) => {
-		setCurId(id);
-		onChange(id);
+	const handleSelect = (uuid: string) => {
+		setCurId(uuid);
+		onChange(uuid);
 	};
 
-	const handleSwitch = async (id: number, status: STATUS) => {
+	const handleSwitch = async (uuid: string, status: STATUS) => {
 		try {
-			await invoke(COMMAND.UPDATE_GROUP_STATUS, { id, status });
+			await invoke(COMMAND.UPDATE_GROUP_STATUS, { uuid, status });
 			await getList();
 			toast({
 				description: "switch group status success",
@@ -42,7 +42,7 @@ const Sidebar: FC<SidebarProps> = ({ onChange }) => {
 		try {
 			const groups: Group[] = await invoke(COMMAND.READ_CONF);
 			setGroups(groups);
-			setInitId && setCurId(groups[0].id);
+			setInitId && setCurId(groups[0].uuid);
 		} catch (error) {
 			console.log("[DEBUG] read conf file failed", error);
 			message(`read conf file failed ${error}`, "error");
@@ -50,12 +50,12 @@ const Sidebar: FC<SidebarProps> = ({ onChange }) => {
 	};
 
 	return (
-		<div className="h-[calc(100%-54px)] w-60 overflow-auto mt-[30px]">
+		<div className="h-[calc(100%-54px)] w-80 overflow-auto mt-[30px] text-sm">
 			{groups.map((g) => (
 				<Item
-					key={g.id}
+					key={g.uuid}
 					group={g}
-					active={curId === g.id}
+					active={curId === g.uuid}
 					onSwitch={handleSwitch}
 					onClick={handleSelect}
 				/>

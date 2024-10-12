@@ -3,6 +3,7 @@ use std::fs::{self, File};
 use std::io::{Error, Read, Write};
 use std::path::Path;
 use tauri::{App, Emitter};
+use uuid::Uuid;
 
 use crate::err_to_string;
 
@@ -25,7 +26,13 @@ pub fn joint_content() -> AnyHowResult<String> {
     let ids_content: Vec<String> = groups
         .into_iter()
         .filter(|g| g.status == Status::ON)
-        .filter_map(|g| err_to_string!(read_group(g.id)).ok())
+        .filter_map(|g| {
+            if let Ok(group_detail) = read_group(g.id) {
+                Some(group_detail.content)
+            } else {
+                None
+            }
+        })
         .collect();
     Ok(ids_content.join("\n"))
 }
@@ -68,6 +75,7 @@ pub async fn app_init(app: &App) {
     {
         let default_group = Group {
             id: 0,
+            uuid: Uuid::new_v4(),
             name: "default_group".to_string(),
             status: Status::ON,
             update_time: chrono::Utc::now().timestamp(),

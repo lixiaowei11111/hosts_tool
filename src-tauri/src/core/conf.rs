@@ -1,10 +1,12 @@
 use super::constants::ID_CONFIG_PATH;
 use super::error::AnyHowResult;
 use crate::err_to_string;
+use anyhow::Ok;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{Read, Write};
 use std::vec::Vec;
+use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub enum Status {
@@ -16,7 +18,8 @@ pub enum Status {
 #[derive(Serialize, Deserialize)]
 pub struct Group {
     pub name: String,
-    pub id: u32,
+    pub id: usize,
+    pub uuid: Uuid,
     pub status: Status,
     pub update_time: i64,
 }
@@ -40,11 +43,11 @@ pub fn update_conf(groups: Vec<Group>) -> AnyHowResult {
 }
 
 #[tauri::command]
-pub fn update_group_status(id: u32, status: Status) -> AnyHowResult {
+pub fn update_group_status(uuid: Uuid, status: Status) -> AnyHowResult {
     let mut groups = err_to_string!(read_conf())?;
     use chrono::Utc;
     for group in &mut groups {
-        if group.id == id {
+        if group.uuid.eq(&uuid) {
             group.status = status;
             group.update_time = Utc::now().timestamp();
             break;
@@ -55,13 +58,13 @@ pub fn update_group_status(id: u32, status: Status) -> AnyHowResult {
 }
 
 #[tauri::command]
-pub fn del_single_group(id: u32) -> AnyHowResult {
+pub fn del_single_group(uuid: Uuid) -> AnyHowResult {
     let groups = err_to_string!(read_conf())?;
     use chrono::Utc;
     let groups = groups
         .into_iter()
         .filter_map(|mut g| {
-            if g.id == id {
+            if g.uuid.eq(&uuid) {
                 // completely erase
                 if g.status == Status::DELETE {
                     None
@@ -79,3 +82,20 @@ pub fn del_single_group(id: u32) -> AnyHowResult {
     err_to_string!(update_conf(groups))?;
     Ok(())
 }
+
+pub fn add_single_group(name: String) -> AnyHowResult {
+    let groups = err_to_string!(read_conf())?;
+    let uuid = Uuid::new_v4();
+    Ok(())
+}
+
+pub fn get_max_id() -> AnyHowResult<usize> {
+    let mut groups = err_to_string!(read_conf())?;
+    let ids: Vec<usize> = groups.into_iter().map(|g| g.id).collect();
+    let max = ids.into_iter().max().unwrap_or(0usize);
+    Ok(max);
+}
+
+// pub fn get_id_by_uuid(uuid: usize) -> AnyHowResult<Option<Uuid>> {
+//     let groups = err_to_string!(read_conf())?;
+// }

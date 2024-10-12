@@ -7,12 +7,14 @@ export enum STATUS {
 export interface Group {
 	name: string;
 	id: number;
+  uuid:string;
 	status: STATUS;
 	update_time: number;
 }
 
 export interface GroupDetail{
   id: number;
+  uuid:string;
   content: string,
   update_time: number,
 
