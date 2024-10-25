@@ -58,13 +58,13 @@ pub fn update_group_status(uuid: Uuid, status: Status) -> AnyHowResult {
 }
 
 #[tauri::command]
-pub fn del_single_group(uuid: Uuid) -> AnyHowResult {
+pub fn del_single_group(id: usize) -> AnyHowResult {
     let groups = err_to_string!(read_conf())?;
     use chrono::Utc;
     let groups = groups
         .into_iter()
         .filter_map(|mut g| {
-            if g.uuid.eq(&uuid) {
+            if g.id == id {
                 // completely erase
                 if g.status == Status::DELETE {
                     None
@@ -92,10 +92,17 @@ pub fn add_single_group(name: String) -> AnyHowResult {
 pub fn get_max_id() -> AnyHowResult<usize> {
     let mut groups = err_to_string!(read_conf())?;
     let ids: Vec<usize> = groups.into_iter().map(|g| g.id).collect();
-    let max = ids.into_iter().max().unwrap_or(0usize);
-    Ok(max);
+    Ok(ids.into_iter().max().unwrap_or(0))
 }
 
-// pub fn get_id_by_uuid(uuid: usize) -> AnyHowResult<Option<Uuid>> {
-//     let groups = err_to_string!(read_conf())?;
-// }
+pub fn get_id_by_uuid(uuid: Uuid) -> AnyHowResult<Option<usize>> {
+    let groups = err_to_string!(read_conf())?;
+
+    for group in groups {
+        if group.uuid == uuid {
+            return Ok(Some(group.id));
+        }
+    }
+
+    Ok(None)
+}

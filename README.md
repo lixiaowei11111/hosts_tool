@@ -9,3 +9,7 @@ zustand
 ui => config =>hosts
 读取
 ui=>config
+
+
++ 考虑的替代方案
+  -[ ] 使用sqlite代替json文件

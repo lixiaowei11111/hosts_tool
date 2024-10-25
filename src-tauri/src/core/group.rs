@@ -1,6 +1,6 @@
 use crate::err_to_string;
 
-use super::conf::get_max_id;
+use super::conf::{del_single_group, get_max_id};
 use super::constants::LIST_PATH;
 use super::error::AnyHowResult;
 use chrono::Utc;
@@ -40,7 +40,7 @@ pub fn add_group() -> AnyHowResult {
 }
 
 #[tauri::command]
-pub fn del_group(uuid: usize) -> AnyHowResult {
+pub fn del_group(id: usize) -> AnyHowResult {
     let group_path: PathBuf = (&*LIST_PATH).join(id.to_string());
     err_to_string!(fs::remove_file(&group_path))?;
     Ok(())
@@ -73,7 +73,7 @@ pub fn update_group_content(id: usize, content: String) -> AnyHowResult {
 pub fn read_group(id: usize) -> AnyHowResult<GroupDetail> {
     let group_path: PathBuf = (&*LIST_PATH).join(id.to_string());
     if !group_path.exists() {
-        err_to_string!(add_group(id))?;
+        Err(String::from("id does not exist"))
     }
     let mut file = err_to_string!(OpenOptions::new()
         .read(true)

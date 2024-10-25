@@ -13,6 +13,7 @@ import {
 	insertNewline,
 	historyKeymap,
 	history,
+	toggleLineComment,
 } from "@codemirror/commands";
 
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +27,7 @@ interface EditorProps {
 // https://codemirror.net/docs/ref/#commands.insertNewlineAndIndent
 const customKeymap = keymap.of([
 	{ key: "Enter", run: insertNewline },
+	{ key: "Mod-/", run: toggleLineComment },
 	...defaultKeymap,
 	...historyKeymap,
 ]);

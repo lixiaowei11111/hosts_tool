@@ -2,9 +2,19 @@ import { StreamLanguage } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
 import type { StreamParser, StringStream } from "@codemirror/language";
 import { HighlightStyle } from "@codemirror/language";
+import type{ CommentTokens } from "@codemirror/commands";
 interface CustomParserState {
 	lineStart: boolean;
 	hasSpace: boolean;
+	languageData:{
+		commentTokens:CommentTokens;
+	}
+}
+
+const languageData={
+	commentTokens:{
+		line:"#"
+	}
 }
 
 const customParser: StreamParser<CustomParserState> = {
@@ -47,8 +57,9 @@ const customParser: StreamParser<CustomParserState> = {
 		return null;
 	},
 	startState(): CustomParserState {
-		return { lineStart: true, hasSpace: false };
+		return { lineStart: true, hasSpace: false,languageData };
 	},
+	
 };
 
 export const customLanguage =
