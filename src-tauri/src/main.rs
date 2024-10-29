@@ -22,13 +22,14 @@ fn main() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
-            group::add_group,
-            group::del_group,
+            group::add_group_detail,
+            group::del_group_detail,
             group::update_group_content,
-            group::read_group,
+            group::read_group_detail,
             conf::read_conf,
             conf::update_conf,
             conf::update_group_status,
+            conf::add_single_group,
             conf::del_single_group,
             init::read_system_hosts,
             init::update_system_hosts,

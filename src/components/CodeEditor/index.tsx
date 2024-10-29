@@ -40,7 +40,7 @@ const Editor: FC<EditorProps> = ({ uuid }) => {
 
 	const getGroupDetailById = useCallback(async (uuid: string) => {
 		try {
-			const groupDetail: GroupDetail = await invoke(COMMAND.READ_GROUP, {
+			const groupDetail: GroupDetail = await invoke(COMMAND.READ_GROUP_DETAIL, {
 				uuid,
 			});
 			console.log("[DEBUG] read group detail success", groupDetail);

@@ -1,16 +1,16 @@
-use chrono;
 use std::fs::{self, File};
 use std::io::{Error, Read, Write};
 use std::path::Path;
+
+use chrono::Utc;
 use tauri::{App, Emitter};
 use uuid::Uuid;
-
-use crate::err_to_string;
 
 use super::conf::{read_conf, Group, Status};
 use super::constants::{END_POSITION, HOSTS_PATH, ID_CONFIG_PATH, LIST_PATH, START_POSITION};
 use super::error::AnyHowResult;
-use super::group::{add_group, read_group};
+use super::group::{add_group_detail, read_group_detail};
+use crate::err_to_string;
 
 #[tauri::command]
 pub fn read_system_hosts() -> AnyHowResult<String> {
@@ -27,7 +27,7 @@ pub fn joint_content() -> AnyHowResult<String> {
         .into_iter()
         .filter(|g| g.status == Status::ON)
         .filter_map(|g| {
-            if let Ok(group_detail) = read_group(g.id) {
+            if let Ok(group_detail) = read_group_detail(g.id) {
                 Some(group_detail.content)
             } else {
                 None
@@ -73,12 +73,14 @@ pub async fn app_init(app: &App) {
             .trim()
             .is_empty()
     {
+        let uuid = Uuid::new_v4();
+        let id = 1usize;
         let default_group = Group {
-            id: 0,
-            uuid: Uuid::new_v4(),
-            name: "default_group".to_string(),
+            id,
+            uuid,
+            name: String::from("默认"),
             status: Status::ON,
-            update_time: chrono::Utc::now().timestamp(),
+            update_time: Utc::now().timestamp(),
         };
         let default_content = serde_json::to_string(&vec![default_group]).unwrap();
 
@@ -86,7 +88,8 @@ pub async fn app_init(app: &App) {
             create_failed(app, e);
         } else if let Err(e) = File::create(&*ID_CONFIG_PATH).and_then(|mut file| {
             file.write_all(default_content.as_bytes()).and_then(|_| {
-                add_group(0).map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
+                add_group_detail(id, uuid)
+                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
             })
         }) {
             create_failed(app, e);

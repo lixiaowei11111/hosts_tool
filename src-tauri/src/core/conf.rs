@@ -1,12 +1,16 @@
 use super::constants::ID_CONFIG_PATH;
 use super::error::AnyHowResult;
+use super::group::{add_group_detail, del_group_detail};
+use super::id::generate_id;
 use crate::err_to_string;
-use anyhow::Ok;
+
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
 use std::fs::File;
 use std::io::{Read, Write};
 use std::vec::Vec;
-use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub enum Status {
@@ -43,11 +47,11 @@ pub fn update_conf(groups: Vec<Group>) -> AnyHowResult {
 }
 
 #[tauri::command]
-pub fn update_group_status(uuid: Uuid, status: Status) -> AnyHowResult {
+pub fn update_group_status(id: usize, status: Status) -> AnyHowResult {
     let mut groups = err_to_string!(read_conf())?;
     use chrono::Utc;
     for group in &mut groups {
-        if group.uuid.eq(&uuid) {
+        if group.id == id {
             group.status = status;
             group.update_time = Utc::now().timestamp();
             break;
@@ -65,8 +69,9 @@ pub fn del_single_group(id: usize) -> AnyHowResult {
         .into_iter()
         .filter_map(|mut g| {
             if g.id == id {
-                // completely erase
                 if g.status == Status::DELETE {
+                    // completely erase
+                    del_group_detail(id).unwrap();
                     None
                 } else {
                     // to bin
@@ -83,26 +88,19 @@ pub fn del_single_group(id: usize) -> AnyHowResult {
     Ok(())
 }
 
+#[tauri::command]
 pub fn add_single_group(name: String) -> AnyHowResult {
-    let groups = err_to_string!(read_conf())?;
-    let uuid = Uuid::new_v4();
-    Ok(())
-}
-
-pub fn get_max_id() -> AnyHowResult<usize> {
     let mut groups = err_to_string!(read_conf())?;
-    let ids: Vec<usize> = groups.into_iter().map(|g| g.id).collect();
-    Ok(ids.into_iter().max().unwrap_or(0))
-}
-
-pub fn get_id_by_uuid(uuid: Uuid) -> AnyHowResult<Option<usize>> {
-    let groups = err_to_string!(read_conf())?;
-
-    for group in groups {
-        if group.uuid == uuid {
-            return Ok(Some(group.id));
-        }
-    }
-
-    Ok(None)
+    let id = err_to_string!(generate_id())?;
+    let uuid = Uuid::new_v4();
+    err_to_string!(add_group_detail(id, uuid))?; // keep order
+    let group = Group {
+        name,
+        id,
+        uuid,
+        status: Status::ON,
+        update_time: Utc::now().timestamp(),
+    };
+    groups.push(group);
+    Ok(())
 }
