@@ -5,7 +5,7 @@
 mod core;
 mod setup;
 
-use core::{conf, constants::LOG_PATH, group, init};
+use core::{conf, constants::LOG_PATH, group, init, util};
 fn main() {
     tauri::Builder::default()
         .plugin(
@@ -31,8 +31,8 @@ fn main() {
             conf::update_group_status,
             conf::add_single_group,
             conf::del_single_group,
-            init::read_system_hosts,
-            init::update_system_hosts,
+            util::read_system_hosts,
+            util::update_system_hosts,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

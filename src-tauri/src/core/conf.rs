@@ -1,16 +1,16 @@
-use super::constants::ID_CONFIG_PATH;
-use super::error::AnyHowResult;
-use super::group::{add_group_detail, del_group_detail};
-use super::id::generate_id;
-use crate::err_to_string;
+use std::fs::File;
+use std::io::{Read, Write};
+use std::vec::Vec;
 
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use std::fs::File;
-use std::io::{Read, Write};
-use std::vec::Vec;
+use super::constants::ID_CONFIG_PATH;
+use super::error::AnyHowResult;
+use super::group::{add_group_detail, del_group_detail};
+use super::util::{generate_id, get_system_hosts_update_time};
+use crate::err_to_string;
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub enum Status {
@@ -29,12 +29,25 @@ pub struct Group {
 }
 type GroupList = Vec<Group>;
 
+pub fn get_system_group() -> AnyHowResult<Group> {
+    let hosts_group = Group {
+        id: 0usize,
+        name: String::from("系统"),
+        uuid: Uuid::new_v4(),
+        status: Status::ON,
+        update_time: get_system_hosts_update_time()?,
+    };
+    Ok(hosts_group)
+}
+
 #[tauri::command]
 pub fn read_conf() -> AnyHowResult<GroupList> {
     let mut file = err_to_string!(File::open(&*ID_CONFIG_PATH))?;
     let mut contents = String::new();
     err_to_string!(file.read_to_string(&mut contents))?;
-    let groups: GroupList = err_to_string!(serde_json::from_str(&contents))?;
+    let mut groups: GroupList = err_to_string!(serde_json::from_str(&contents))?;
+    let hosts_group = get_system_group()?;
+    groups.insert(0, hosts_group);
     Ok(groups)
 }
 
@@ -71,7 +84,7 @@ pub fn del_single_group(id: usize) -> AnyHowResult {
             if g.id == id {
                 if g.status == Status::DELETE {
                     // completely erase
-                    del_group_detail(id).unwrap();
+                    del_group_detail(id).expect("del group detail failed");
                     None
                 } else {
                     // to bin

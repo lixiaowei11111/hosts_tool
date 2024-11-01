@@ -5,11 +5,11 @@ import { Toaster } from "@/components/ui/toaster";
 import Titlebar from "../Titlebar";
 
 const MainLayout = () => {
-	const [uuid, setId] = useState<string>("");
+	const [id, setId] = useState<number>(0);
 
-	// group uuid change
-	const handleSidebarChange = (uuid: string) => {
-		setId(uuid);
+	// group id change
+	const handleSidebarChange = (id: number) => {
+		setId(id);
 	};
 
 	return (
@@ -20,7 +20,7 @@ const MainLayout = () => {
 			<Sidebar onChange={handleSidebarChange} />
 			<main className="w-full border-l-[1px] border-solid border-gray-400">
 				<div className="h-[calc(100%-54px)] overflow-auto mt-[30px]">
-					<Editor uuid={uuid} />
+					<Editor id={id} />
 				</div>
 				<footer className="w-full h-6 text-gray-500 indent-[30px]">
 					display some information

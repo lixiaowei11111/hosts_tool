@@ -20,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useDebounceFn } from "ahooks";
 
 interface EditorProps {
-	uuid: string;
+	id: number;
 	onChange?: (doc: string) => void;
 }
 
@@ -32,39 +32,49 @@ const customKeymap = keymap.of([
 	...historyKeymap,
 ]);
 
-const Editor: FC<EditorProps> = ({ uuid }) => {
+const Editor: FC<EditorProps> = ({ id }) => {
 	const editorRef = useRef<HTMLDivElement>(null);
 	const viewRef = useRef<EditorView | null>(null);
 
 	const { toast } = useToast();
 
-	const getGroupDetailById = useCallback(async (uuid: string) => {
+	const handleUpdateContent = (doc: string) => {
+		const transaction = viewRef.current?.state.update({
+			changes: {
+				from: 0,
+				to: viewRef.current.state.doc.length,
+				insert: doc,
+			},
+			effects: StateEffect.appendConfig.of(EditorView.editable.of(id !== 0)),
+		});
+		transaction && viewRef.current?.dispatch(transaction);
+	};
+
+	const getGroupDetailById = async (id: number) => {
 		try {
 			const groupDetail: GroupDetail = await invoke(COMMAND.READ_GROUP_DETAIL, {
-				uuid,
+				id,
 			});
 			console.log("[DEBUG] read group detail success", groupDetail);
-			const transaction = viewRef.current?.state.update({
-				changes: {
-					from: 0,
-					insert: groupDetail.content,
-				},
-				effects: StateEffect.appendConfig.of(EditorView.editable.of(!uuid)),
-			});
-			transaction && viewRef.current?.dispatch(transaction);
+			handleUpdateContent(groupDetail.content);
 			console.log(
 				"[debug] dispatch after",
 				viewRef.current?.state.toJSON().doc,
 			);
 		} catch (error) {
+			handleUpdateContent("");
+			toast({
+				description: "read failed",
+				variant: "destructive",
+			});
 			console.log("[DEBUG] read group detail failed", error);
 		}
-	}, []);
+	};
 
 	const handleUpdateGroup = async () => {
 		try {
 			const content = viewRef.current?.state.toJSON().doc;
-			await invoke(COMMAND.UPDATE_GROUP_CONTENT, { uuid, content });
+			await invoke(COMMAND.UPDATE_GROUP_CONTENT, { id, content });
 			toast({
 				description: "save success",
 				variant: "success",
@@ -140,8 +150,8 @@ const Editor: FC<EditorProps> = ({ uuid }) => {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		getGroupDetailById(uuid);
-	}, [uuid]);
+		getGroupDetailById(id);
+	}, [id]);
 
 	return <div ref={editorRef} />;
 };

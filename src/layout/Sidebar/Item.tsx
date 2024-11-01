@@ -7,8 +7,8 @@ import Icon from "@/components/Icon";
 interface ItemProps {
 	active: boolean;
 	group: Group;
-	onSwitch: (uuid: string, status: STATUS) => void;
-	onClick: (uuid: string) => void;
+	onSwitch: (id: number, status: STATUS) => void;
+	onClick: (id: number) => void;
 }
 
 const statusToChecked = (status: STATUS): boolean => status === STATUS.ON;
@@ -18,11 +18,11 @@ const checkedToStatus = (checked: boolean): STATUS =>
 
 const Item: FC<ItemProps> = ({ group, onSwitch, active, onClick }) => {
 	const handleCheckedChange = async (checked: boolean) => {
-		onSwitch(group.uuid, checkedToStatus(checked));
+		onSwitch(group.id, checkedToStatus(checked));
 	};
 
 	const handleClick = () => {
-		onClick(group.uuid);
+		onClick(group.id);
 	};
 
 	return (
@@ -37,11 +37,13 @@ const Item: FC<ItemProps> = ({ group, onSwitch, active, onClick }) => {
 				<Icon className="text-sm" type="file" />
 				<span className="ml-1">{group.name}</span>
 			</div>
-			<Switch
-				id={group.uuid.toString()}
-				checked={statusToChecked(group.status)}
-				onCheckedChange={handleCheckedChange}
-			/>
+			{group.id !== 0 && (
+				<Switch
+					id={group.id.toString()}
+					checked={statusToChecked(group.status)}
+					onCheckedChange={handleCheckedChange}
+				/>
+			)}
 		</div>
 	);
 };
