@@ -46,8 +46,11 @@ pub fn read_conf() -> AnyHowResult<GroupList> {
     let mut contents = String::new();
     err_to_string!(file.read_to_string(&mut contents))?;
     let mut groups: GroupList = err_to_string!(serde_json::from_str(&contents))?;
-    let hosts_group = get_system_group()?;
-    groups.insert(0, hosts_group);
+    if groups.iter().any(|group| group.id == 0) {
+        let hosts_group = get_system_group()?;
+        groups.insert(0, hosts_group);
+    }
+
     Ok(groups)
 }
 

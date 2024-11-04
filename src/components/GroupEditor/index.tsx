@@ -20,15 +20,15 @@ import { Input } from "../ui/input";
 import { useState } from "react";
 
 interface GroupEditorProps {
-	uuid?: number;
+	id?: number;
 	isEdit: boolean;
 	onClose?: MouseEventHandler<HTMLButtonElement>;
 }
 
 const GroupEditor: FC<PropsWithChildren<GroupEditorProps>> = ({
-	uuid,
+	// id,
 	isEdit,
-	onClose,
+	// onClose,
 	children,
 }) => {
 	const [hostname, setHostname] = useState<string>("");

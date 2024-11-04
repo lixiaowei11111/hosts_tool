@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useRef, useEffect, useCallback, useMemo } from "react";
+import { useRef, useEffect, useMemo } from "react";
 // ipc
 import { invoke } from "@tauri-apps/api/core";
 import { COMMAND, type GroupDetail } from "@/lib/ipc";
