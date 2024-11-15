@@ -1,4 +1,3 @@
-import Icon from "@/components/Icon";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useMemo, useState } from "react";
 import { css } from "@emotion/react";
@@ -9,6 +8,8 @@ import type {
 	MouseEventHandler,
 	PropsWithChildren,
 } from "react";
+
+import Icon from "@/components/Icon";
 
 const titlebarStyle = css`
 	height: 30px;
@@ -100,7 +101,7 @@ const BaseTitleBar: FC<PropsWithChildren> = ({ children }) => {
 
 	return (
 		<div css={titlebarStyle} onMouseDown={handleMouseDown}>
-			<div>{children}</div>
+			<div className="flex-1">{children}</div>
 			<div>
 				<Icon
 					css={titlebarButtonStyle}

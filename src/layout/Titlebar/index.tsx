@@ -1,10 +1,28 @@
-import BaseTitleBar from "@/components/BaseTitleBar";
-import Icon from "@/components/Icon";
+import { css } from "@emotion/react";
 import type { FC } from "react";
+
+import Icon from "@/components/Icon";
+import BaseTitleBar from "@/components/BaseTitleBar";
 import GroupEditor from "@/components/GroupEditor";
+
 import { titlebarButtonStyle } from "@/components/BaseTitleBar";
+import { useGroupStore } from "@/store";
+
+const titleStyle = css`
+  width: 100%;
+  text-align: center;
+  line-height: 30px;
+  font-size: 16px;
+  font-weight: bold;
+  flex: 1;
+	letter-spacing: 2px;
+	word-spacing: 2px;
+	pointer-events: none;
+`;
 
 const Titlebar: FC = () => {
+	const group = useGroupStore((state) => state.currentGroup);
+
 	return (
 		<BaseTitleBar>
 			<div className="flex justify-start items-center">
@@ -12,6 +30,11 @@ const Titlebar: FC = () => {
 					<GroupEditor isEdit>
 						<Icon css={titlebarButtonStyle} type="create" />
 					</GroupEditor>
+				</div>
+				<div css={titleStyle}>
+					<Icon type="file" />
+					&nbsp;
+					{group?.name}
 				</div>
 			</div>
 		</BaseTitleBar>

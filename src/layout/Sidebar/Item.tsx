@@ -4,11 +4,11 @@ import { type Group, STATUS } from "@/lib/ipc";
 import { cn } from "@/lib/utils";
 import Icon from "@/components/Icon";
 
-interface ItemProps {
+export interface ItemProps {
 	active: boolean;
 	group: Group;
 	onSwitch: (id: number, status: STATUS) => void;
-	onClick: (id: number) => void;
+	onClick: (group: Group) => void;
 }
 
 const statusToChecked = (status: STATUS): boolean => status === STATUS.ON;
@@ -22,7 +22,7 @@ const Item: FC<ItemProps> = ({ group, onSwitch, active, onClick }) => {
 	};
 
 	const handleClick = () => {
-		onClick(group.id);
+		onClick(group);
 	};
 
 	return (
