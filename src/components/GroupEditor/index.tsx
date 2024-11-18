@@ -18,20 +18,28 @@ import type {
 } from "react";
 import { Input } from "../ui/input";
 import { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
+import { COMMAND } from "@/lib/ipc";
+import { message } from "@tauri-apps/plugin-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface GroupEditorProps {
 	id?: number;
-	isEdit: boolean;
+	isEdit?: boolean;
 	onClose?: MouseEventHandler<HTMLButtonElement>;
+	onSaveSuccess?: () => void;
 }
 
 const GroupEditor: FC<PropsWithChildren<GroupEditorProps>> = ({
 	// id,
-	isEdit,
+	isEdit = false,
 	// onClose,
 	children,
+	onSaveSuccess,
 }) => {
 	const [hostname, setHostname] = useState<string>("");
+	const [open, setOpen] = useState(false);
+	const { toast } = useToast();
 
 	const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
 		setHostname(e.target.value.trim());
@@ -41,19 +49,32 @@ const GroupEditor: FC<PropsWithChildren<GroupEditorProps>> = ({
 			handleAddOrUpdate();
 		}
 	};
-	const handleAddOrUpdate = () => {
-		console.log("[debug] submit");
+	const handleAddOrUpdate = async () => {
+		try {
+			if (!isEdit) {
+				await invoke(COMMAND.ADD_SINGLE_GROUP, { name: hostname });
+				toast({
+					description: "add group success",
+					variant: "success",
+				});
+				setOpen(false);
+				onSaveSuccess?.();
+			}
+		} catch (error) {
+			console.log("[debug] add or update group error", error);
+			message(`read conf file failed ${error}`, "error");
+		}
 	};
 
 	return (
-		<Dialog>
-			<DialogTrigger>{children}</DialogTrigger>
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger onClick={() => setOpen(true)}>{children}</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle />
 					<DialogDescription />
 				</DialogHeader>
-				<div className="grid gap-4 py-4">
+				<div>
 					<div className="flex w-full max-w-sm items-center space-x-2">
 						<Input
 							value={hostname}

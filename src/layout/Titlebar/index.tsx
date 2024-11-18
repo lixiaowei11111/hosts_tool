@@ -20,14 +20,18 @@ const titleStyle = css`
 	pointer-events: none;
 `;
 
-const Titlebar: FC = () => {
+interface TitlebarProps {
+	onSaveSuccess?: () => void;
+}
+
+const Titlebar: FC<TitlebarProps> = ({ onSaveSuccess }) => {
 	const group = useGroupStore((state) => state.currentGroup);
 
 	return (
 		<BaseTitleBar>
 			<div className="flex justify-start items-center">
-				<div>
-					<GroupEditor isEdit>
+				<div className="pointer-events-auto">
+					<GroupEditor onSaveSuccess={onSaveSuccess}>
 						<Icon css={titlebarButtonStyle} type="create" />
 					</GroupEditor>
 				</div>

@@ -39,15 +39,19 @@ const Editor: FC<EditorProps> = ({ id }) => {
 	const { toast } = useToast();
 
 	const handleUpdateContent = (doc: string) => {
-		const transaction = viewRef.current?.state.update({
+		const view = viewRef.current;
+		const transaction = view?.state.update({
 			changes: {
 				from: 0,
-				to: viewRef.current.state.doc.length,
+				to: view.state.doc.length,
 				insert: doc,
 			},
 			effects: StateEffect.appendConfig.of(EditorView.editable.of(id !== 0)),
 		});
-		transaction && viewRef.current?.dispatch(transaction);
+		if (transaction) {
+			id !== 0 && view?.focus();
+			view?.dispatch(transaction);
+		}
 	};
 
 	const getGroupDetailById = async (id: number) => {

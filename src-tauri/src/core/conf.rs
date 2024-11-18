@@ -46,11 +46,10 @@ pub fn read_conf() -> AnyHowResult<GroupList> {
     let mut contents = String::new();
     err_to_string!(file.read_to_string(&mut contents))?;
     let mut groups: GroupList = err_to_string!(serde_json::from_str(&contents))?;
-    if groups.iter().any(|group| group.id == 0) {
+    if !groups.iter().any(|group| group.id == 0) {
         let hosts_group = get_system_group()?;
         groups.insert(0, hosts_group);
     }
-
     Ok(groups)
 }
 
@@ -64,7 +63,7 @@ pub fn update_conf(groups: Vec<Group>) -> AnyHowResult {
 
 #[tauri::command]
 pub fn update_group_status(id: usize, status: Status) -> AnyHowResult {
-    let mut groups = err_to_string!(read_conf())?;
+    let mut groups = read_conf()?;
     use chrono::Utc;
     for group in &mut groups {
         if group.id == id {
@@ -73,13 +72,13 @@ pub fn update_group_status(id: usize, status: Status) -> AnyHowResult {
             break;
         }
     }
-    err_to_string!(update_conf(groups))?;
+    update_conf(groups)?;
     Ok(())
 }
 
 #[tauri::command]
 pub fn del_single_group(id: usize) -> AnyHowResult {
-    let groups = err_to_string!(read_conf())?;
+    let groups = read_conf()?;
     use chrono::Utc;
     let groups = groups
         .into_iter()
@@ -100,16 +99,16 @@ pub fn del_single_group(id: usize) -> AnyHowResult {
             }
         })
         .collect();
-    err_to_string!(update_conf(groups))?;
+    update_conf(groups)?;
     Ok(())
 }
 
 #[tauri::command]
 pub fn add_single_group(name: String) -> AnyHowResult {
-    let mut groups = err_to_string!(read_conf())?;
-    let id = err_to_string!(generate_id())?;
+    let mut groups = read_conf()?;
+    let id = generate_id()?;
     let uuid = Uuid::new_v4();
-    err_to_string!(add_group_detail(id, uuid))?; // keep order
+    add_group_detail(id, uuid)?; // keep order
     let group = Group {
         name,
         id,
@@ -118,5 +117,6 @@ pub fn add_single_group(name: String) -> AnyHowResult {
         update_time: Utc::now().timestamp(),
     };
     groups.push(group);
+    update_conf(groups)?;
     Ok(())
 }

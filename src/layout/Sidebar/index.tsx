@@ -8,19 +8,23 @@ import { useGroupStore } from "@/store";
 import type { ItemProps } from "./Item";
 
 interface SidebarProps {
+	groups: Group[];
 	onChange: (id: number) => void;
+	onSwitch: (id?: number, status?: STATUS) => void;
 }
 
-const Sidebar: FC<SidebarProps> = ({ onChange }) => {
+const Sidebar: FC<SidebarProps> = ({ groups, onChange, onSwitch }) => {
 	const { toast } = useToast();
 
-	const [groups, setGroups] = useState<Group[]>([]);
 	const [curId, setCurId] = useState<number>(0);
 
 	const updateGroup = useGroupStore((state) => state.updateGroup);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		getList(true);
+		setCurId(groups[0]?.id);
+		updateGroup(groups?.[0]);
+		console.log("[debug] sidebar is update", groups, updateGroup);
 	}, []);
 
 	const handleSelect: ItemProps["onClick"] = (group: Group) => {
@@ -29,24 +33,10 @@ const Sidebar: FC<SidebarProps> = ({ onChange }) => {
 		updateGroup(group);
 	};
 
-	const getList = async (setInitId = false) => {
-		try {
-			const groups: Group[] = await invoke(COMMAND.READ_CONF);
-			setGroups(groups);
-			if (setInitId) {
-				setCurId(groups[0].id);
-				updateGroup(groups[0]);
-			}
-		} catch (error) {
-			console.log("[DEBUG] read conf file failed", error);
-			message(`read conf file failed ${error}`, "error");
-		}
-	};
-
 	const handleSwitch = async (id: number, status: STATUS) => {
 		try {
 			await invoke(COMMAND.UPDATE_GROUP_STATUS, { id, status });
-			await getList();
+			onSwitch();
 			toast({
 				description: "switch group status success",
 				variant: "success",

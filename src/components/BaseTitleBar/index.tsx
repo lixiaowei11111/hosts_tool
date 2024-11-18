@@ -101,7 +101,7 @@ const BaseTitleBar: FC<PropsWithChildren> = ({ children }) => {
 
 	return (
 		<div css={titlebarStyle} onMouseDown={handleMouseDown}>
-			<div className="flex-1">{children}</div>
+			<div className="flex-1 pointer-events-none">{children}</div>
 			<div>
 				<Icon
 					css={titlebarButtonStyle}
