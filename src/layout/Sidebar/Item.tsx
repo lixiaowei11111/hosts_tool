@@ -66,18 +66,19 @@ const Item: FC<ItemProps> = ({ group, onSwitch, active, onClick }) => {
 				<span className="ml-1">{group.name}</span>
 			</div>
 			{group.id !== 0 && (
-				<div
-					className="flex items-center"
-					onMouseEnter={handleMouseEnter}
-					onMouseLeave={handleMouseLeave}
-				>
+				<div className="flex items-center">
 					<Switch
 						id={group.id.toString()}
 						checked={statusToChecked(group.status)}
 						onCheckedChange={handleCheckedChange}
 						onClick={handleSwitchClick}
 					/>
-					<animated.div style={{ ...deleteIconSpring, ...shakeSpring }}>
+					<animated.div
+						className="ml-1"
+						style={{ ...deleteIconSpring, ...shakeSpring }}
+						onMouseEnter={handleMouseEnter}
+						onMouseLeave={handleMouseLeave}
+					>
 						<Icon
 							className="cursor-pointer text-2xl"
 							type="delete"
