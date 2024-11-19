@@ -31,7 +31,7 @@ export const titlebarButtonStyle = css`
   height: 30px;
   user-select: none;
   -webkit-user-select: none;
-	color: #222;
+	color: #000 !important;
 	&:hover {
   	background: #eee;
 	}
@@ -110,7 +110,6 @@ const BaseTitleBar: FC<PropsWithChildren> = ({ children }) => {
 				/>
 				<Icon
 					css={titlebarButtonStyle}
-					className="text-[14px]"
 					type={isMaximized ? "window-restore" : "window-maximize"}
 					onClick={handleToggleMaximize}
 				/>

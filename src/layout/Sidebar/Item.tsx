@@ -1,8 +1,9 @@
 import { Switch } from "@/components/ui/switch";
-import type { FC } from "react";
+import { useState, type FC } from "react";
 import { type Group, STATUS } from "@/lib/ipc";
 import { cn } from "@/lib/utils";
 import Icon from "@/components/Icon";
+import { animated, useSpring } from "@react-spring/web";
 
 export interface ItemProps {
 	active: boolean;
@@ -17,13 +18,40 @@ const checkedToStatus = (checked: boolean): STATUS =>
 	checked ? STATUS.ON : STATUS.OFF;
 
 const Item: FC<ItemProps> = ({ group, onSwitch, active, onClick }) => {
+	const [isHovered, setIsHovered] = useState(false);
+
+	const deleteIconSpring = useSpring({
+		opacity: isHovered ? 1 : 0,
+		config: { tension: 300, friction: 10 },
+	});
+
+	const shakeSpring = useSpring({
+		transform: isHovered
+			? "rotate(-5deg) translateX(-2px)"
+			: "rotate(0deg) translateX(0px)",
+		config: { tension: 300, friction: 5, mass: 5 },
+		loop: isHovered ? { reverse: true } : false,
+	});
+
 	const handleCheckedChange = async (checked: boolean) => {
 		onSwitch(group.id, checkedToStatus(checked));
+	};
+
+	const handleSwitchClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation();
+	};
+
+	const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation();
+		onSwitch(group.id, STATUS.DELETE);
 	};
 
 	const handleClick = () => {
 		onClick(group);
 	};
+
+	const handleMouseEnter = () => setIsHovered(true);
+	const handleMouseLeave = () => setIsHovered(false);
 
 	return (
 		<div
@@ -38,11 +66,25 @@ const Item: FC<ItemProps> = ({ group, onSwitch, active, onClick }) => {
 				<span className="ml-1">{group.name}</span>
 			</div>
 			{group.id !== 0 && (
-				<Switch
-					id={group.id.toString()}
-					checked={statusToChecked(group.status)}
-					onCheckedChange={handleCheckedChange}
-				/>
+				<div
+					className="flex items-center"
+					onMouseEnter={handleMouseEnter}
+					onMouseLeave={handleMouseLeave}
+				>
+					<Switch
+						id={group.id.toString()}
+						checked={statusToChecked(group.status)}
+						onCheckedChange={handleCheckedChange}
+						onClick={handleSwitchClick}
+					/>
+					<animated.div style={{ ...deleteIconSpring, ...shakeSpring }}>
+						<Icon
+							className="cursor-pointer text-2xl"
+							type="delete"
+							onClick={handleDeleteClick}
+						/>
+					</animated.div>
+				</div>
 			)}
 		</div>
 	);

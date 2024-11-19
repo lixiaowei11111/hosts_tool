@@ -29,7 +29,7 @@ const Titlebar: FC<TitlebarProps> = ({ onSaveSuccess }) => {
 
 	return (
 		<BaseTitleBar>
-			<div className="flex justify-start items-center">
+			<div className="flex justify-start items-center h-full">
 				<div className="pointer-events-auto">
 					<GroupEditor onSaveSuccess={onSaveSuccess}>
 						<Icon css={titlebarButtonStyle} type="create" />

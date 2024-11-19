@@ -7,6 +7,8 @@ pub const END_POSITION: &str = r#"#  --- MINI_HOSTS_END ---"#;
 
 #[cfg(target_os = "windows")]
 pub const HOSTS_PATH: &str = r#"C:\Windows\System32\drivers\etc\hosts"#;
+// TODO :DELETE
+pub const TEST_HOSTS_PATH: &str = r#"E:\rust\tauri\mini_hosts\hosts"#;
 
 // TODO
 #[cfg(any(target_os = "macos", target_os = "linux"))]
