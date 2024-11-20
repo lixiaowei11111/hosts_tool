@@ -1,7 +1,7 @@
 {
-  "productName": "mini-hosts",
+  "productName": "hosts-tool",
   "version": "0.1.0",
-  "identifier": "com.mini-hosts.app",
+  "identifier": "com.hosts-tool.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "decorations": false,
-        "title": "mini-hosts",
+        "title": "hosts-tool",
         "width": 1000,
         "height": 600,
         "transparent": true,

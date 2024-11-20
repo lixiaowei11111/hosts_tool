@@ -1,5 +1,5 @@
 [package]
-name = "mini-hosts"
+name = "hosts-tool"
 version = "0.1.0"
 description = "A Tauri App"
 authors = ["lxw"]
