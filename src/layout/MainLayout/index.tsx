@@ -50,6 +50,7 @@ const MainLayout = () => {
 				groups={groups}
 				onChange={handleSidebarChange}
 				onSwitch={handleSaveSuccess}
+				onDelete={handleSaveSuccess}
 			/>
 			<main className="w-full border-l-[1px] border-solid border-gray-400">
 				<div className="h-[calc(100%-54px)] overflow-auto mt-[30px]">

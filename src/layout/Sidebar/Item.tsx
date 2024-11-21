@@ -10,6 +10,7 @@ export interface ItemProps {
 	group: Group;
 	onSwitch: (id: number, status: STATUS) => void;
 	onClick: (group: Group) => void;
+	onDelete: (id: number) => void;
 }
 
 const statusToChecked = (status: STATUS): boolean => status === STATUS.ON;
@@ -17,7 +18,13 @@ const statusToChecked = (status: STATUS): boolean => status === STATUS.ON;
 const checkedToStatus = (checked: boolean): STATUS =>
 	checked ? STATUS.ON : STATUS.OFF;
 
-const Item: FC<ItemProps> = ({ group, onSwitch, active, onClick }) => {
+const Item: FC<ItemProps> = ({
+	group,
+	active,
+	onSwitch,
+	onClick,
+	onDelete,
+}) => {
 	const [isHovered, setIsHovered] = useState(false);
 
 	const deleteIconSpring = useSpring({
@@ -43,7 +50,7 @@ const Item: FC<ItemProps> = ({ group, onSwitch, active, onClick }) => {
 
 	const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		onSwitch(group.id, STATUS.DELETE);
+		onDelete(group.id);
 	};
 
 	const handleClick = () => {
