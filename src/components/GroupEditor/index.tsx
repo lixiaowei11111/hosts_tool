@@ -58,6 +58,7 @@ const GroupEditor: FC<PropsWithChildren<GroupEditorProps>> = ({
 					variant: "success",
 				});
 				setOpen(false);
+				setHostname("");
 				onSaveSuccess?.();
 			}
 		} catch (error) {
@@ -79,7 +80,7 @@ const GroupEditor: FC<PropsWithChildren<GroupEditorProps>> = ({
 						<Input
 							value={hostname}
 							placeholder="HostName"
-							maxLength={64}
+							maxLength={20}
 							onChange={handleChange}
 							onKeyDown={handleKeyDown}
 						/>

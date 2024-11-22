@@ -68,12 +68,15 @@ const Item: FC<ItemProps> = ({
 				active ? "bg-[hsl(212,100%,48%,0.3)]" : "",
 			)}
 		>
-			<div>
-				<Icon className="text-sm" type="file" />
-				<span className="ml-1">{group.name}</span>
+			<div className="flex items-center overflow-hidden mr-2 flex-grow">
+				<Icon className="text-sm flex-shrink-0" type="file" />
+				<span className="ml-1 truncate">{group.name}</span>
 			</div>
 			{group.id !== 0 && (
-				<div className="flex items-center">
+				<div
+					className="flex items-center flex-shrink-0"
+					style={{ width: "60px" }}
+				>
 					<Switch
 						id={group.id.toString()}
 						checked={statusToChecked(group.status)}
