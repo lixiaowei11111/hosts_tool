@@ -64,7 +64,7 @@ const Item: FC<ItemProps> = ({
 		<div
 			onClick={handleClick}
 			className={cn(
-				"py-2 px-4 text-white flex items-center justify-between",
+				"py-2 px-4 text-white flex items-center justify-between cursor-pointer",
 				active ? "bg-[hsl(212,100%,48%,0.3)]" : "",
 			)}
 		>

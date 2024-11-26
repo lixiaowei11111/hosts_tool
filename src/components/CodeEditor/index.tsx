@@ -82,10 +82,11 @@ const Editor: FC<EditorProps> = ({ id }) => {
 		}
 	};
 
-	const handleUpdateGroup = async () => {
+	const handleUpdateGroup = async (notify = true) => {
 		try {
 			const content = viewRef.current?.state.toJSON().doc;
 			await invoke(COMMAND.UPDATE_GROUP_CONTENT, { id, content });
+			if (!notify) return;
 			toast({
 				description: "save success",
 				variant: "success",
@@ -165,7 +166,7 @@ const Editor: FC<EditorProps> = ({ id }) => {
 		getGroupDetailById(id);
 	}, [id]);
 
-	return <div ref={editorRef} />;
+	return <div ref={editorRef} onBlur={() => handleUpdateGroup(false)} />;
 };
 
 export default Editor;
