@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use super::constants::LIST_PATH;
 use super::error::AnyHowResult;
-use super::util::{get_system_hosts_update_time, read_system_hosts};
+use super::util::{get_system_hosts_update_time, read_system_hosts, update_system_hosts};
 use crate::err_to_string;
 
 #[derive(Serialize, Deserialize)]
@@ -16,6 +16,7 @@ pub struct GroupDetail {
     pub id: usize,
     pub uuid: Uuid,
     pub content: String,
+    #[serde(rename = "updateTime")]
     pub update_time: i64,
 }
 
@@ -79,6 +80,7 @@ pub fn update_group_content(id: usize, content: String) -> AnyHowResult {
     err_to_string!(file.set_len(0))?;
 
     err_to_string!(file.write_all(updated_contents.as_bytes()))?;
+    update_system_hosts()?;
     Ok(())
 }
 

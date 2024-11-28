@@ -1,7 +1,6 @@
 export enum STATUS {
 	ON = "ON",
 	OFF = "OFF",
-	DELETE = "DELETE",
 }
 
 export interface Group {
@@ -9,6 +8,7 @@ export interface Group {
 	id: number;
 	uuid: string;
 	status: STATUS;
+	isDelete: boolean;
 	updateTime: number;
 }
 

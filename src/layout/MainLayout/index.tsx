@@ -50,13 +50,15 @@ const MainLayout = () => {
 				groups={groups}
 				onChange={handleSidebarChange}
 				onSwitch={handleSaveSuccess}
+				onDelete={handleSaveSuccess}
 			/>
 			<main className="w-full border-l-[1px] border-solid border-gray-400">
 				<div className="h-[calc(100%-54px)] overflow-auto mt-[30px]">
 					<Editor id={id} />
 				</div>
-				<footer className="w-full h-6 text-gray-500 indent-[30px] text-sm">
-					更新时间: {dayjs(group?.updateTime).format("YYYY-MM-DD HH:mm:ss")}
+				<footer className="w-full h-6 text-gray-500 indent-[32px] text-xs">
+					最后修改时间:
+					{dayjs((group?.updateTime || 0) * 1000).format("YYYY-MM-DD HH:mm:ss")}
 				</footer>
 			</main>
 			<Toaster />

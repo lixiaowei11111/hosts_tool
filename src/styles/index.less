@@ -1,4 +1,4 @@
-@import "//at.alicdn.com/t/c/font_4703547_l72qgnaxv7n.css";
+@import "//at.alicdn.com/t/c/font_4703547_whywkr0ndfr.css";
 
 @tailwind base;
 @tailwind components;
@@ -121,4 +121,44 @@ button {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* scrollbar 样式 */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cfcfcf;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-track {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track-piece {
+  background: transparent;
+}
+
+/* 修改原生 scrollbar 样式 */
+.scrollbar-style::-webkit-scrollbar-track {
+  background-color: rgba(255, 255, 255, 0);
+  border-radius: 6px;
+}
+
+.scrollbar-style::-webkit-scrollbar {
+  width: 8px;
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.scrollbar-style::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
 }

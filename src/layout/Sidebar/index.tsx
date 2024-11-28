@@ -11,9 +11,15 @@ interface SidebarProps {
 	groups: Group[];
 	onChange: (id: number) => void;
 	onSwitch: (id?: number, status?: STATUS) => void;
+	onDelete: (id: number) => void;
 }
 
-const Sidebar: FC<SidebarProps> = ({ groups, onChange, onSwitch }) => {
+const Sidebar: FC<SidebarProps> = ({
+	groups,
+	onChange,
+	onDelete,
+	onSwitch,
+}) => {
 	const { toast } = useToast();
 
 	const [curId, setCurId] = useState<number>(0);
@@ -24,7 +30,6 @@ const Sidebar: FC<SidebarProps> = ({ groups, onChange, onSwitch }) => {
 	useEffect(() => {
 		setCurId(groups[0]?.id);
 		updateGroup(groups?.[0]);
-		console.log("[debug] sidebar is update", groups, updateGroup);
 	}, []);
 
 	const handleSelect: ItemProps["onClick"] = (group: Group) => {
@@ -47,6 +52,21 @@ const Sidebar: FC<SidebarProps> = ({ groups, onChange, onSwitch }) => {
 		}
 	};
 
+	const handleDelete = async (id: number) => {
+		try {
+			await invoke(COMMAND.DEL_SINGLE_GROUP, { id });
+			toast({
+				description: "delete group status success",
+				variant: "success",
+			});
+			onDelete(id);
+			setCurId(0);
+		} catch (error) {
+			console.log("[DEBUG]", error);
+			message(`delete group status failed ${error}`, "error");
+		}
+	};
+
 	return (
 		<div className="h-[calc(100%-54px)] w-80 overflow-auto mt-[30px] text-sm">
 			{groups.map((g) => (
@@ -56,6 +76,7 @@ const Sidebar: FC<SidebarProps> = ({ groups, onChange, onSwitch }) => {
 					active={curId === g.id}
 					onSwitch={handleSwitch}
 					onClick={handleSelect}
+					onDelete={handleDelete}
 				/>
 			))}
 		</div>

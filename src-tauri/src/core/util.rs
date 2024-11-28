@@ -1,13 +1,14 @@
 use std::fs::{self, File};
 use std::io::{Read, Write};
-use std::os::windows::fs::MetadataExt;
 use std::path::Path;
+use std::string::String;
+use std::time::UNIX_EPOCH;
 
 use uuid::Uuid;
 
 use super::conf::read_conf;
 use super::conf::Status;
-use super::constants::{END_POSITION, HOSTS_PATH, START_POSITION};
+use super::constants::{END_POSITION, HOSTS_PATH, START_POSITION, TEST_HOSTS_PATH};
 use super::error::AnyHowResult;
 use super::group::read_group_detail;
 use crate::err_to_string;
@@ -23,6 +24,7 @@ pub fn generate_id() -> AnyHowResult<usize> {
     Ok(max_id + 1)
 }
 
+#[allow(dead_code)]
 pub fn get_id_by_uuid(uuid: Uuid) -> AnyHowResult<Option<usize>> {
     let groups = err_to_string!(read_conf())?;
     let mut id: Option<usize> = None;
@@ -46,15 +48,16 @@ pub fn read_system_hosts() -> AnyHowResult<String> {
 
 pub fn get_system_hosts_update_time() -> AnyHowResult<i64> {
     let hosts_metadata = err_to_string!(fs::metadata(HOSTS_PATH))?;
-    let modified: u64 = hosts_metadata.last_write_time();
-    Ok(modified as i64)
+    let modified = err_to_string!(hosts_metadata.modified())?;
+    let duration = err_to_string!(modified.duration_since(UNIX_EPOCH))?;
+    Ok(duration.as_secs() as i64)
 }
 
 pub fn joint_content() -> AnyHowResult<String> {
-    let groups = err_to_string!(read_conf())?;
+    let groups = read_conf()?;
     let ids_content: Vec<String> = groups
         .into_iter()
-        .filter(|g| g.status == Status::ON)
+        .filter(|g| g.status == Status::ON && g.id != 0)
         .filter_map(|g| {
             if let Ok(group_detail) = read_group_detail(g.id) {
                 Some(group_detail.content)
@@ -68,8 +71,8 @@ pub fn joint_content() -> AnyHowResult<String> {
 
 #[tauri::command]
 pub fn update_system_hosts() -> AnyHowResult {
-    let contents = err_to_string!(joint_content())?;
-    let system_hosts = err_to_string!(read_system_hosts())?;
+    let contents = joint_content()?;
+    let system_hosts = read_system_hosts()?;
 
     let start_index = system_hosts
         .find(START_POSITION)
@@ -79,13 +82,14 @@ pub fn update_system_hosts() -> AnyHowResult {
         .unwrap_or(system_hosts.len());
 
     let new_hosts = format!(
-        "{}\n{}\n{}\n{}",
+        "{}\n\n{}\n\n{}\n\n{}\n\n{}",
         &system_hosts[..start_index],
         START_POSITION,
         contents,
-        &system_hosts[end_index..]
+        END_POSITION,
+        &system_hosts[end_index..],
     );
-    let mut file = err_to_string!(File::create(HOSTS_PATH))?;
+    let mut file = err_to_string!(File::create(TEST_HOSTS_PATH))?;
     err_to_string!(file.write_all(new_hosts.as_bytes()))?;
     Ok(())
 }

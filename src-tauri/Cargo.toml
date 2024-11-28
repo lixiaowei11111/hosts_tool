@@ -1,5 +1,5 @@
 [package]
-name = "mini-hosts"
+name = "hosts-tool"
 version = "0.1.0"
 description = "A Tauri App"
 authors = ["lxw"]
@@ -25,3 +25,4 @@ window-vibrancy = "0.5.2"
 tauri-plugin-dialog = "2.0.1"
 anyhow = "1.0.89"
 uuid = { version = "1.10.0", features = ["serde"] }
+heck = "0.5.0"

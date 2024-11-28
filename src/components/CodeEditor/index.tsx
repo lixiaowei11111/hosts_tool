@@ -48,9 +48,16 @@ const Editor: FC<EditorProps> = ({ id }) => {
 			},
 			effects: StateEffect.appendConfig.of(EditorView.editable.of(id !== 0)),
 		});
-		if (transaction) {
-			id !== 0 && view?.focus();
-			view?.dispatch(transaction);
+		if (transaction && view) {
+			view.dispatch(transaction);
+			if (id !== 0) {
+				const endPosition = view.state.doc.length;
+				view.dispatch({
+					selection: { anchor: endPosition, head: endPosition },
+					scrollIntoView: true,
+				});
+				view.focus();
+			}
 		}
 	};
 
@@ -75,10 +82,11 @@ const Editor: FC<EditorProps> = ({ id }) => {
 		}
 	};
 
-	const handleUpdateGroup = async () => {
+	const handleUpdateGroup = async (notify = true) => {
 		try {
 			const content = viewRef.current?.state.toJSON().doc;
 			await invoke(COMMAND.UPDATE_GROUP_CONTENT, { id, content });
+			if (!notify) return;
 			toast({
 				description: "save success",
 				variant: "success",
@@ -137,6 +145,7 @@ const Editor: FC<EditorProps> = ({ id }) => {
 				customTheme,
 				customLanguage,
 				syntaxHighlighting(customHighlightStyle),
+				EditorView.editable.of(id !== 0),
 			],
 		});
 
@@ -150,14 +159,14 @@ const Editor: FC<EditorProps> = ({ id }) => {
 		return () => {
 			view.destroy();
 		};
-	}, [saveKeymap]);
+	}, [saveKeymap, id]);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		getGroupDetailById(id);
 	}, [id]);
 
-	return <div ref={editorRef} />;
+	return <div ref={editorRef} onBlur={() => handleUpdateGroup(false)} />;
 };
 
 export default Editor;

@@ -16,7 +16,6 @@ use crate::err_to_string;
 pub enum Status {
     ON,
     OFF,
-    DELETE,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -25,6 +24,9 @@ pub struct Group {
     pub id: usize,
     pub uuid: Uuid,
     pub status: Status,
+    #[serde(rename = "isDelete")]
+    pub is_delete: bool,
+    #[serde(rename = "updateTime")]
     pub update_time: i64,
 }
 type GroupList = Vec<Group>;
@@ -35,6 +37,7 @@ pub fn get_system_group() -> AnyHowResult<Group> {
         name: String::from("系统"),
         uuid: Uuid::new_v4(),
         status: Status::ON,
+        is_delete: false,
         update_time: get_system_hosts_update_time()?,
     };
     Ok(hosts_group)
@@ -46,10 +49,15 @@ pub fn read_conf() -> AnyHowResult<GroupList> {
     let mut contents = String::new();
     err_to_string!(file.read_to_string(&mut contents))?;
     let mut groups: GroupList = err_to_string!(serde_json::from_str(&contents))?;
+
     if !groups.iter().any(|group| group.id == 0) {
         let hosts_group = get_system_group()?;
         groups.insert(0, hosts_group);
     }
+    groups = groups
+        .into_iter()
+        .filter(|group| !group.is_delete)
+        .collect();
     Ok(groups)
 }
 
@@ -84,22 +92,15 @@ pub fn del_single_group(id: usize) -> AnyHowResult {
         .into_iter()
         .filter_map(|mut g| {
             if g.id == id {
-                if g.status == Status::DELETE {
-                    // completely erase
-                    del_group_detail(id).expect("del group detail failed");
-                    None
-                } else {
-                    // to bin
-                    g.status = Status::DELETE;
-                    g.update_time = Utc::now().timestamp();
-                    Some(g)
-                }
-            } else {
-                Some(g)
+                // to bin
+                g.is_delete = true;
+                g.update_time = Utc::now().timestamp();
             }
+            Some(g)
         })
         .collect();
     update_conf(groups)?;
+    del_group_detail(id)?;
     Ok(())
 }
 
@@ -114,6 +115,7 @@ pub fn add_single_group(name: String) -> AnyHowResult {
         id,
         uuid,
         status: Status::ON,
+        is_delete: false,
         update_time: Utc::now().timestamp(),
     };
     groups.push(group);
