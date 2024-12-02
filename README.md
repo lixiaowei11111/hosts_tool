@@ -1,15 +1,4 @@
-platform: Windows
+supprot platform: windows 10
 
-
-shadcn/ui
-zustand
-
-数据流向
-写入/修改
-ui => config =>hosts
-读取
-ui=>config
-
-
-+ 考虑的替代方案
-  -[ ] 使用sqlite代替json文件
+refer tech statck:
+rust tauri2 biome vite react react-spring code-mirror v6 typescript ahooks shadcn/ui tailwindcss emotion

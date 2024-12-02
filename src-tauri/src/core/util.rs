@@ -14,19 +14,19 @@ use super::group::read_group_detail;
 use crate::err_to_string;
 
 pub fn get_max_id() -> AnyHowResult<usize> {
-    let groups = err_to_string!(read_conf())?;
+    let groups = read_conf(false)?;
     let ids: Vec<usize> = groups.into_iter().map(|g| g.id).collect();
     Ok(ids.into_iter().max().unwrap_or(0))
 }
 
 pub fn generate_id() -> AnyHowResult<usize> {
-    let max_id = err_to_string!(get_max_id())?;
+    let max_id = get_max_id()?;
     Ok(max_id + 1)
 }
 
 #[allow(dead_code)]
 pub fn get_id_by_uuid(uuid: Uuid) -> AnyHowResult<Option<usize>> {
-    let groups = err_to_string!(read_conf())?;
+    let groups = read_conf(false)?;
     let mut id: Option<usize> = None;
     for group in groups {
         if group.uuid == uuid {
@@ -54,10 +54,10 @@ pub fn get_system_hosts_update_time() -> AnyHowResult<i64> {
 }
 
 pub fn joint_content() -> AnyHowResult<String> {
-    let groups = read_conf()?;
+    let groups = read_conf(false)?;
     let ids_content: Vec<String> = groups
         .into_iter()
-        .filter(|g| g.status == Status::ON && g.id != 0)
+        .filter(|g| g.status == Status::ON)
         .filter_map(|g| {
             if let Ok(group_detail) = read_group_detail(g.id) {
                 Some(group_detail.content)

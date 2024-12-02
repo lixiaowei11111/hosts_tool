@@ -21,7 +21,7 @@ const titleStyle = css`
 `;
 
 interface TitlebarProps {
-	onSaveSuccess?: () => void;
+	onSaveSuccess?: (id: number) => void;
 }
 
 const Titlebar: FC<TitlebarProps> = ({ onSaveSuccess }) => {

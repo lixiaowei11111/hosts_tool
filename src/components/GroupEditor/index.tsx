@@ -27,13 +27,11 @@ interface GroupEditorProps {
 	id?: number;
 	isEdit?: boolean;
 	onClose?: MouseEventHandler<HTMLButtonElement>;
-	onSaveSuccess?: () => void;
+	onSaveSuccess?: (id: number) => void;
 }
 
 const GroupEditor: FC<PropsWithChildren<GroupEditorProps>> = ({
-	// id,
 	isEdit = false,
-	// onClose,
 	children,
 	onSaveSuccess,
 }) => {
@@ -52,14 +50,16 @@ const GroupEditor: FC<PropsWithChildren<GroupEditorProps>> = ({
 	const handleAddOrUpdate = async () => {
 		try {
 			if (!isEdit) {
-				await invoke(COMMAND.ADD_SINGLE_GROUP, { name: hostname });
+				const id: number = await invoke(COMMAND.ADD_SINGLE_GROUP, {
+					name: hostname,
+				});
 				toast({
 					description: "add group success",
 					variant: "success",
 				});
 				setOpen(false);
 				setHostname("");
-				onSaveSuccess?.();
+				onSaveSuccess?.(id);
 			}
 		} catch (error) {
 			console.log("[debug] add or update group error", error);

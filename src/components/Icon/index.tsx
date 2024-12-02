@@ -8,7 +8,6 @@ interface IconProps {
 
 const Icon: FC<IconProps> = ({ type, className, onClick }) => {
 	return (
-		// biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
 		<i
 			className={`hosts-tool ht-${type} ${className || ""}`}
 			onClick={onClick}

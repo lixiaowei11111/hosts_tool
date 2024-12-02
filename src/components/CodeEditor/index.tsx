@@ -68,10 +68,6 @@ const Editor: FC<EditorProps> = ({ id }) => {
 			});
 			console.log("[DEBUG] read group detail success", groupDetail);
 			handleUpdateContent(groupDetail.content);
-			console.log(
-				"[debug] dispatch after",
-				viewRef.current?.state.toJSON().doc,
-			);
 		} catch (error) {
 			handleUpdateContent("");
 			toast({
@@ -83,6 +79,7 @@ const Editor: FC<EditorProps> = ({ id }) => {
 	};
 
 	const handleUpdateGroup = async (notify = true) => {
+		if (id === 0) return;
 		try {
 			const content = viewRef.current?.state.toJSON().doc;
 			await invoke(COMMAND.UPDATE_GROUP_CONTENT, { id, content });

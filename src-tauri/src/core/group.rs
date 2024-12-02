@@ -92,7 +92,6 @@ pub fn read_group_detail(id: usize) -> AnyHowResult<GroupDetail> {
     let group_path: PathBuf = (&*LIST_PATH).join(id.to_string());
     if !group_path.exists() {
         return Err(String::from("id does not exist"));
-        // Err(String::from("id does not exist"))
     }
     let mut file = err_to_string!(OpenOptions::new()
         .read(true)

@@ -44,13 +44,13 @@ pub fn get_system_group() -> AnyHowResult<Group> {
 }
 
 #[tauri::command]
-pub fn read_conf() -> AnyHowResult<GroupList> {
+pub fn read_conf(need_system: bool) -> AnyHowResult<GroupList> {
     let mut file = err_to_string!(File::open(&*ID_CONFIG_PATH))?;
     let mut contents = String::new();
     err_to_string!(file.read_to_string(&mut contents))?;
     let mut groups: GroupList = err_to_string!(serde_json::from_str(&contents))?;
 
-    if !groups.iter().any(|group| group.id == 0) {
+    if need_system && !groups.iter().any(|group| group.id == 0) {
         let hosts_group = get_system_group()?;
         groups.insert(0, hosts_group);
     }
@@ -71,7 +71,7 @@ pub fn update_conf(groups: Vec<Group>) -> AnyHowResult {
 
 #[tauri::command]
 pub fn update_group_status(id: usize, status: Status) -> AnyHowResult {
-    let mut groups = read_conf()?;
+    let mut groups = read_conf(false)?;
     use chrono::Utc;
     for group in &mut groups {
         if group.id == id {
@@ -86,13 +86,12 @@ pub fn update_group_status(id: usize, status: Status) -> AnyHowResult {
 
 #[tauri::command]
 pub fn del_single_group(id: usize) -> AnyHowResult {
-    let groups = read_conf()?;
+    let groups = read_conf(false)?;
     use chrono::Utc;
     let groups = groups
         .into_iter()
         .filter_map(|mut g| {
             if g.id == id {
-                // to bin
                 g.is_delete = true;
                 g.update_time = Utc::now().timestamp();
             }
@@ -105,8 +104,8 @@ pub fn del_single_group(id: usize) -> AnyHowResult {
 }
 
 #[tauri::command]
-pub fn add_single_group(name: String) -> AnyHowResult {
-    let mut groups = read_conf()?;
+pub fn add_single_group(name: String) -> AnyHowResult<usize> {
+    let mut groups = read_conf(false)?;
     let id = generate_id()?;
     let uuid = Uuid::new_v4();
     add_group_detail(id, uuid)?; // keep order
@@ -120,5 +119,5 @@ pub fn add_single_group(name: String) -> AnyHowResult {
     };
     groups.push(group);
     update_conf(groups)?;
-    Ok(())
+    Ok(id)
 }
