@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use super::conf::read_conf;
 use super::conf::Status;
-use super::constants::{END_POSITION, HOSTS_PATH, START_POSITION, TEST_HOSTS_PATH};
+use super::constants::{END_POSITION, HOSTS_PATH, START_POSITION};
 use super::error::AnyHowResult;
 use super::group::read_group_detail;
 use crate::err_to_string;
@@ -71,7 +71,8 @@ pub fn joint_content() -> AnyHowResult<String> {
 
 #[tauri::command]
 pub fn update_system_hosts() -> AnyHowResult {
-    let contents = joint_content()?;
+    let binding = joint_content()?;
+    let contents = binding.trim();
     let system_hosts = read_system_hosts()?;
 
     let start_index = system_hosts
@@ -81,15 +82,25 @@ pub fn update_system_hosts() -> AnyHowResult {
         .find(END_POSITION)
         .unwrap_or(system_hosts.len());
 
-    let new_hosts = format!(
-        "{}\n\n{}\n\n{}\n\n{}\n\n{}",
-        &system_hosts[..start_index],
-        START_POSITION,
-        contents,
-        END_POSITION,
-        &system_hosts[end_index..],
-    );
-    let mut file = err_to_string!(File::create(TEST_HOSTS_PATH))?;
+    let new_hosts = if end_index < system_hosts.len() {
+        format!(
+            "{}{}\n\n{}\n\n{}",
+            &system_hosts[..start_index],
+            START_POSITION,
+            contents,
+            &system_hosts[end_index..],
+        )
+    } else {
+        format!(
+            "{}\n\n{}\n\n{}\n\n{}\n\n{}",
+            &system_hosts[..start_index],
+            START_POSITION,
+            contents,
+            END_POSITION,
+            &system_hosts[end_index..],
+        )
+    };
+    let mut file = err_to_string!(File::create(HOSTS_PATH))?;
     err_to_string!(file.write_all(new_hosts.as_bytes()))?;
     Ok(())
 }

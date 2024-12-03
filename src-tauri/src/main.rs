@@ -5,7 +5,7 @@
 mod core;
 mod setup;
 
-use core::{conf, constants::LOG_PATH, group, init, util};
+use core::{conf, constants::LOG_PATH, group, util};
 fn main() {
     tauri::Builder::default()
         .plugin(

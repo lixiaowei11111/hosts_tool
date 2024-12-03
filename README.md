@@ -1,3 +1,5 @@
+rust practice project
+
 supprot platform: windows 10
 
 refer tech statck:

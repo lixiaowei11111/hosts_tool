@@ -8,7 +8,7 @@ import Titlebar from "../Titlebar";
 import Sidebar from "../Sidebar";
 
 import dayjs from "dayjs";
-import { COMMAND, type Group } from "@/lib/ipc";
+import { COMMAND, STATUS, type Group } from "@/lib/ipc";
 import { message } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
 
@@ -63,7 +63,7 @@ const MainLayout = () => {
 				description: "switch group status success",
 				variant: "success",
 			});
-			getList();
+			await getList();
 		} catch (error) {
 			console.log("[DEBUG]", error);
 			message(`switch group status failed ${error}`, "error");
@@ -73,12 +73,14 @@ const MainLayout = () => {
 	const handleDelete: ItemProps["onDelete"] = async (id) => {
 		try {
 			await invoke(COMMAND.DEL_SINGLE_GROUP, { id });
+			await handleSwitch(id, STATUS.OFF);
+			await invoke(COMMAND.UPDATE_SYSTEM_HOSTS);
+			await getList();
+			setDeleted(true);
 			toast({
 				description: "delete group status success",
 				variant: "success",
 			});
-			await getList();
-			setDeleted(true);
 		} catch (error) {
 			console.log("[DEBUG]", error);
 			message(`delete group status failed ${error}`, "error");
